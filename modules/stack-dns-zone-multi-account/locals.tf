@@ -4,7 +4,7 @@ locals {
   //1. Enable master 'hosted zone' creation
   is_master_config_enabled = !var.is_enabled ? false : var.master_account_config == null ? false : lower(trimspace(var.master_account_config.target_env)) == lower(trimspace(var.environment))
 
-  master_config_normalised = !local.master_config_normalised ? {} : {
+  master_config_normalised = !local.is_master_config_enabled ? {} : {
     name               = trimspace(var.master_account_config.domain)
     target_env         = trimspace(var.master_account_config.target_env)
     force_destroy      = length(var.environments_to_protect_from_destroy) == 0 ? true : contains(var.environments_to_protect_from_destroy, lookup(var.master_account_config, "target_env")) ? false : true
@@ -19,10 +19,7 @@ locals {
     ]
   }
 
-  master_certificate_is_enabled = !local.master_certificate_is_enabled ? false : var.master_account_config.enable_certificate
-
-  // 1.1 Enable certificate for the master account.
-
+  master_certificate_is_enabled = !local.is_master_config_enabled ? false : var.master_account_config.enable_certificate
 
   //2. Child environments.
   is_envs_config_enabled = !var.is_enabled ? false : var.environments_config == null ? false : length(var.environments_config) > 0
