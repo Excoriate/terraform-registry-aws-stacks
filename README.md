@@ -1,8 +1,8 @@
 <h1 align="center">
   <img alt="logo" src="https://forum.huawei.com/enterprise/en/data/attachment/forum/202204/21/120858nak5g1epkzwq5gcs.png" width="224px"/><br/>
-  Terraform AWS ☁️ Networking 🌎
+  🧩 Terraform AWS ☁️ Stacks 📚
 </h1>
-<p align="center">An easy to understand, opinionated terraform <b>composable</b> set of modules for managing Networking and Traffic in <b> for AWS ☁️</b>.<br/><br/>
+<p align="center">An easy to understand, opinionated terraform <b>composable</b> set of Stack-composite modules that solves  <b> real-world problems ☁️</b>while using Stacks.<br/><br/>
 
 ---
 
@@ -32,7 +32,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Module
 
-This module encapsulate a set of modules that configure, and provision accounts-related resources on AWS.
+This repository is a collection (always evolving) of terraform modules that I use in my day-to-day work. It's a collection of modules that I use to solve real-world problems, and I'm sharing them with the community. I hope you find them useful. The collection of modules placed here are **stack-composite** modules, that implement specific functionality as ready-to-use _architectures_ for common use-cases. Common uses cases refers to:
+
+* **Network**: VPC, Subnets, NAT Gateways, Internet Gateways, Route Tables, etc.
+* **Restful services**: ALB, on top of an Elastic Container service, with the necessary settings to allow a quick deployment
+* etc.
 
 ---
 
@@ -43,9 +47,9 @@ The documentation is **automatically generated** by [terraform-docs](https://ter
 
 ### Capabilities
 
-| Module    | Status   | Description                                   |
-|-----------|----------|-----------------------------------------------|
-| `aws-vpc` | Stable ✅ | Create a full managed Virtual Private Network |
+| Module         | Status   | Description                                                                                                                                               |
+|----------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `aws-alb-http` | Stable ✅ | Stack-composite module that implement a common ALB/Ingress architecture, for fronting a backend such as an ECS-based (micro?) service, API or equivalent. |
 
 ### Getting Started
 
@@ -53,7 +57,7 @@ Check the example recipes 🥗 [here](examples)
 
 ### Roadmap
 
-- [ ] Add support for SCP.
+* [ ] 👨🏻‍💻 Add built-in ACM certificates into the **[stack-alb-http](modules/stack-alb-http) module**
 
 ### Module standard structure
 
@@ -109,17 +113,17 @@ The module's relevant components, structure and "skeleton" is described below:
 
 Where:
 
-- **⚡️Modules**: refers to the actual module's directory. Where the `.tf` files reside. Each `subdirectory` is a module.
-- **⚡️Examples**: refers to the examples directory, where the examples recipes lives. These are also used for testing the infrastructure using [Terratest](https://terratest.gruntwork.io/). For its specific documentation, query [this link](examples/README.md)
-- **⚡️Tests**: refers to the tests directory, where the tests recipes lives. These are also used for testing the infrastructure using [Terratest](https://terratest.gruntwork.io/). For its specific documentation, query [this link](tests/README.md)
+* **⚡️Modules**: refers to the actual module's directory. Where the `.tf` files reside. Each `subdirectory` is a module.
+* **⚡️Examples**: refers to the examples directory, where the examples recipes lives. These are also used for testing the infrastructure using [Terratest](https://terratest.gruntwork.io/). For its specific documentation, query [this link](examples/README.md)
+* **⚡️Tests**: refers to the tests directory, where the tests recipes lives. These are also used for testing the infrastructure using [Terratest](https://terratest.gruntwork.io/). For its specific documentation, query [this link](tests/README.md)
 
 ## Developer Experience
 
 Some tools that this repo uses:
 
-- 🧰 Terraform — strongly recommended the latest versions
-- 🧰 Go — justified mostly for **[Terratest](https://terratest.gruntwork.io/)**
-- 🧰 [TaskFile](https://taskfile.dev/#/) — for the automation of the tasks.
+* 🧰 Terraform — strongly recommended the latest versions
+* 🧰 Go — justified mostly for **[Terratest](https://terratest.gruntwork.io/)**
+* 🧰 [TaskFile](https://taskfile.dev/#/) — for the automation of the tasks.
 
 >**NOTE**: For automation during the development process, I use [precommit](https://pre-commit.com/), which is a framework for managing and maintaining multi-language pre-commit hooks. It's a great tool, and I highly recommend it. All the hooks required are installed by [this](./DevEx/scripts/hooks/install-pre-commit-hooks-deps.sh) script. It's recommended though to run it through the [TaskFile](./TaskFile.yml) task `pre-commit-init`.
 
@@ -202,8 +206,8 @@ Given a version number `MAJOR.MINOR.PATCH`, we increment the:
 
 ### Backwards compatibility in `0.0.z` and `0.y.z` version
 
-- Backwards compatibility in versions `0.0.z` is **not guaranteed** when `z` is increased. (Initial development)
-- Backwards compatibility in versions `0.y.z` is **not guaranteed** when `y` is increased. (Pre-release)
+* Backwards compatibility in versions `0.0.z` is **not guaranteed** when `z` is increased. (Initial development)
+* Backwards compatibility in versions `0.y.z` is **not guaranteed** when `y` is increased. (Pre-release)
 
 ## Contributing
 
@@ -218,8 +222,8 @@ Please see [LICENSE] for full details.
 
 ## Contact
 
-- 📧 **Email**: [Alex T.](mailto:alex@ideaup.cl)
-- 🧳 **Linkedin**: [Alex T.](https://www.linkedin.com/in/alextorresruiz/)
+* 📧 **Email**: [Alex T.](mailto:alex@ideaup.cl)
+* 🧳 **Linkedin**: [Alex T.](https://www.linkedin.com/in/alextorresruiz/)
 
 _made/with_ ❤️  🤟
 
