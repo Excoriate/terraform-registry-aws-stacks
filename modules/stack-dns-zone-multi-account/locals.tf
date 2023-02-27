@@ -2,7 +2,27 @@ locals {
   aws_region_to_deploy = var.aws_region
 
   //1. Enable master 'hosted zone' creation
-  master_account_enable_config = !var.is_enabled ? false : var.master_account_config == null ? false : lower(trimspace(var.master_account_config.target_env)) == lower(trimspace(var.environment))
+  is_master_config_enabled = !var.is_enabled ? false : var.master_account_config == null ? false : lower(trimspace(var.master_account_config.target_env)) == lower(trimspace(var.environment))
+
+  master_config_normalised = !local.master_config_normalised ? {} : {
+    name               = trimspace(var.master_account_config.domain)
+    target_env         = trimspace(var.master_account_config.target_env)
+    force_destroy      = length(var.environments_to_protect_from_destroy) == 0 ? true : contains(var.environments_to_protect_from_destroy, lookup(var.master_account_config, "target_env")) ? false : true
+    enable_certificate = var.master_account_config.enable_certificate
+    environments = [
+      for envs in var.master_account_config.environments_to_create : {
+        hosted_zone_name = trimspace(var.master_account_config.domain)
+        record_name      = format("%s.%s", trimspace(envs.name), trimspace(var.master_account_config.domain))
+        name_servers     = envs.name_servers
+        ttl              = envs.ttl
+      }
+    ]
+  }
+
+  master_certificate_is_enabled = !local.master_certificate_is_enabled ? false : var.master_account_config.enable_certificate
+
+  // 1.1 Enable certificate for the master account.
+
 
   //2. Child environments.
   is_envs_config_enabled = !var.is_enabled ? false : var.environments_config == null ? false : length(var.environments_config) > 0

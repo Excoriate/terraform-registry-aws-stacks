@@ -1,29 +1,40 @@
-module "dns_zone_master" {
-  count      = local.master_account_enable_config ? 1 : 0
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.7.0"
+module "master_hosted_zone" {
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.8.0"
   aws_region = var.aws_region
-  is_enabled = local.master_account_enable_config
+  is_enabled = local.is_master_config_enabled
 
   // Specific configuration for 'master' account.
   hosted_zone_stand_alone = [
     {
-      name          = var.master_account_config.domain
+      name          = lookup(local.master_config_normalised, "domain", null)
       comment       = "Master account domain configuration."
-      force_destroy = false
+      force_destroy = lookup(local.master_config_normalised, "force_destroy", false)
     }
   ]
 
-  hosted_zone_stand_alone_name_servers = [
-    for envs in var.master_account_config.environments_to_create : {
-      hosted_zone_name = var.master_account_config.domain
-      record_name      = format("%s.%s", envs.name, var.master_account_config.domain)
-      name_servers     = envs.name_servers
-      ttl              = envs.ttl
+  hosted_zone_stand_alone_name_servers = lookup(local.master_config_normalised, "environments", [])
+}
+
+module "master_certificate" {
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.7.0"
+  aws_region = var.aws_region
+  is_enabled = local.master_certificate_is_enabled
+
+  // Specific configuration for 'master' account.
+  acm_certificate_config = [
+    {
+      name                        = "master-acm-certificate"
+      domain_name                 = lookup(local.master_config_normalised, "domain", null)
+      wait_for_certificate_issued = true
     }
+  ]
+
+  depends_on = [
+    module.master_hosted_zone
   ]
 }
 
-module "dns_environments" {
+module "envs_hosted_zones" {
   for_each   = local.envs_to_create
   source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.7.0"
   aws_region = var.aws_region

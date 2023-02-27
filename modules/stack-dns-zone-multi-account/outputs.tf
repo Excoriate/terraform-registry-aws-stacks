@@ -21,18 +21,18 @@ Custom outputs
 output "feature_flags" {
   value = {
     is_enabled                = var.is_enabled
-    is_master_account_enabled = local.master_account_enable_config
+    is_master_account_enabled = local.is_master_config_enabled
   }
   description = "Describes the feature flags used by this module and their status."
 }
 
 output "master_account_config" {
-  value       = module.dns_zone_master
+  value       = module.master_hosted_zone
   description = "Expose the entire configuration object of the DNS zone in the master account."
 }
 
 output "envs_config" {
-  value       = module.dns_environments
+  value       = module.envs_hosted_zones
   description = "Expose the entire configuration object of the DNS zone in the environment accounts."
 }
 
