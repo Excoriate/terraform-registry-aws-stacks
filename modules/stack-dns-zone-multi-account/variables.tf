@@ -35,6 +35,6 @@ variable "master_account_config" {
   type = object({
     domain                 = string
     target_env             = string
-    environments_to_create = list(object({ name = string, name_servers = list(string) }))
+    environments_to_create = list(object({ name = string, name_servers = list(string), ttl = number }))
   })
 }

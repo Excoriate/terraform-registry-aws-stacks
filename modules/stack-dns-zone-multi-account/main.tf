@@ -1,5 +1,5 @@
 module "dns_zone_master" {
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.5.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.6.0"
   aws_region = var.aws_region
   is_enabled = local.master_account_enable_config
 
@@ -17,7 +17,7 @@ module "dns_zone_master" {
       hosted_zone_name = var.master_account_config.domain
       record_name      = envs.name
       name_servers     = envs.name_servers
-      ttl              = 30
+      ttl              = envs.ttl
     }
   ]
 }
