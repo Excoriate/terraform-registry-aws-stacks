@@ -15,7 +15,7 @@ module "dns_zone_master" {
   hosted_zone_stand_alone_name_servers = [
     for envs in var.master_account_config.environments_to_create : {
       hosted_zone_name = var.master_account_config.domain
-      record_name      = envs.name
+      record_name      = format("%s.%s", envs.name, var.master_account_config.domain)
       name_servers     = envs.name_servers
       ttl              = envs.ttl
     }
