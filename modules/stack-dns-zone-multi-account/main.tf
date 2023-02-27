@@ -21,3 +21,13 @@ module "dns_zone_master" {
     }
   ]
 }
+
+module "dns_environments" {
+  for_each   = local.envs_to_create
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.7.0"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  hosted_zone_subdomains_parent = each.value["hosted_zone_subdomains_parent"]
+  hosted_zone_subdomains_childs = each.value["hosted_zone_subdomains_childs"]
+}

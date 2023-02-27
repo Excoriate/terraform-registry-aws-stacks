@@ -38,3 +38,14 @@ variable "master_account_config" {
     environments_to_create = list(object({ name = string, name_servers = list(string), ttl = number }))
   })
 }
+
+variable "environments_config" {
+  type = list(object({
+    subdomain  = string
+    target_env = string
+    child_zones = list(object({
+      name = string
+      ttl  = number
+    }))
+  }))
+}

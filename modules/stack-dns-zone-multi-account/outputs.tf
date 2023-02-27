@@ -30,3 +30,13 @@ output "master_account_config" {
   value       = module.dns_zone_master
   description = "Expose the entire configuration object of the DNS zone in the master account."
 }
+
+output "envs_config" {
+  value       = module.dns_environments
+  description = "Expose the entire configuration object of the DNS zone in the environment accounts."
+}
+
+output "target_environment" {
+  value       = var.environment
+  description = "The target environment for the module."
+}
