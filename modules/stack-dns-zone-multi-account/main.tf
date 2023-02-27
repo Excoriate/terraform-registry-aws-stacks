@@ -1,4 +1,5 @@
 module "dns_zone_master" {
+  count      = local.master_account_enable_config ? 1 : 0
   source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.7.0"
   aws_region = var.aws_region
   is_enabled = local.master_account_enable_config
