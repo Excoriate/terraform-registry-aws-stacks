@@ -12,7 +12,7 @@ module "master_hosted_zone" {
     }
   ]
 
-  hosted_zone_stand_alone_name_servers = lookup(local.master_config_normalised, "environments", [])
+  hosted_zone_stand_alone_name_servers = lookup(local.master_config_normalised, "environments")
 }
 
 module "master_certificate" {
