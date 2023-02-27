@@ -20,13 +20,13 @@ Custom outputs
 */
 output "feature_flags" {
   value = {
-    is_enabled = var.is_enabled
+    is_enabled                = var.is_enabled
     is_master_account_enabled = local.master_account_enable_config
   }
   description = "Describes the feature flags used by this module and their status."
 }
 
 output "master_account_config" {
-  value = module.dns_zone_master
+  value       = module.dns_zone_master
   description = "Expose the entire configuration object of the DNS zone in the master account."
 }
