@@ -3,13 +3,13 @@ formatter: markdown table
 
 header-from: main.tf
 content: |-
-    # ☁️ AWS DNS Zone
+    # ☁️ AWS DNS delegation in a multi-account environment
     ## Description
     {{ .Header }}
-    This module implement several components, to allow the creation of an HTTP/s API, service or job that act as a backend, fronted by a set of listeners and a load balancer.
-    * 🚀 Create an ALB
-    * 🚀 Create one or many listeners, with one or many rules.
-    * 🚀 Add the necessary security group rules
+    This module creates a multi-account setup for DNS delegation. There are several assumptions that should be taken into consideration:
+    1. There's a `master` account, that's able to override with its `NS` records another account — not managed by this module — which owns the domain.
+    2. Several "child accounts where it's possible to create environment-specifics `subdomains` (e.g. `dev`, `staging`, `prod`).
+    3. Optionally, in each of these environment-specific accounts, it's possible to create "child zones" which are used to separate resource types, e.g. `api`, `web`, `db`, etc.
 
     ---
     ## Example
