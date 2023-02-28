@@ -2,30 +2,18 @@ locals {
   aws_region_to_deploy = var.aws_region
 
   //1. Enable master 'hosted zone' creation
-  is_master_config_enabled = !var.is_enabled ? false : var.master_account_config == null ? false : lower(trimspace(var.master_account_config.target_env)) == lower(trimspace(var.environment))
-
-  master_config_normalised = !local.is_master_config_enabled ? {} : {
-    name               = trimspace(var.master_account_config.domain)
-    target_env         = trimspace(var.master_account_config.target_env)
-    force_destroy      = length(var.environments_to_protect_from_destroy) == 0 ? true : contains(var.environments_to_protect_from_destroy, lookup(var.master_account_config, "target_env")) ? false : true
-    enable_certificate = var.master_account_config.enable_certificate
-    environments = [
-      for envs in var.master_account_config.environments_to_create : {
-        hosted_zone_name = trimspace(var.master_account_config.domain)
-        record_name      = format("%s.%s", trimspace(envs.name), trimspace(var.master_account_config.domain))
-        name_servers     = envs.name_servers
-        ttl              = envs.ttl
-      }
-    ]
-  }
-
-  master_certificate_is_enabled = !local.is_master_config_enabled ? false : var.master_account_config.enable_certificate
+  is_master_config_enabled                 = !var.is_enabled ? false : var.master_zone_config == null ? false : lower(trimspace(var.master_zone_config.target_env)) == lower(trimspace(var.environment))
+  is_master_tls_certificate_enabled        = !local.is_master_config_enabled ? false : var.master_zone_config.enable_certificate
+  is_master_environment_ns_records_enabled = !local.is_master_config_enabled ? false : var.master_zone_config.environments_to_create == null ? false : length(var.master_zone_config.environments_to_create) > 0
+  is_master_unprotected_for_destroy        = !local.is_master_config_enabled ? false : length(var.environments_to_protect_from_destroy) == 0 ? true : !contains(var.environments_to_protect_from_destroy, var.environment)
 
   //2. Child environments.
-  is_envs_config_enabled = !var.is_enabled ? false : var.environments_config == null ? false : length(var.environments_config) > 0
+  is_envs_config_enabled = !var.is_enabled ? false : var.environment_zones_config == null ? false : length(var.environment_zones_config) > 0
   envs_normalized = !local.is_envs_config_enabled ? [] : [
-    for env in var.environments_config : {
-      target_env = env.target_env
+    for env in var.environment_zones_config : {
+      target_env                  = env.target_env
+      enable_certificate          = env["enable_certificate"] == null ? false : env["enable_certificate"]
+      enable_certificate_per_zone = env["enable_certificate_per_zone"] == null ? false : env["enable_certificate_per_zone"]
       subdomain_config = {
         name          = env.subdomain
         force_destroy = env.target_env == "prod" ? false : true
@@ -50,6 +38,9 @@ locals {
         delegation_set_id = null
       }
 
+      enable_certificate          = env["enable_certificate"]
+      enable_certificate_per_zone = env["enable_certificate_per_zone"]
+
       hosted_zone_subdomains_childs = [
         for zone in env["zones_config"] : {
           domain = lookup(env["subdomain_config"], "name")
@@ -59,6 +50,21 @@ locals {
           force_destroy     = lookup(zone, "force_destroy")
           ttl               = lookup(zone, "ttl")
           delegation_set_id = null
+        }
+      ]
+    }
+  }
+
+  tsl_certs_per_subdomain = !local.is_envs_config_enabled ? {} : {
+    for k, v in local.envs_to_create : k => {
+      subdomain  = v["hosted_zone_subdomains_parent"]["name"]
+      is_enabled = true
+      child_zones = [
+        for zone in v["hosted_zone_subdomains_childs"] : {
+          domain         = v["hosted_zone_subdomains_parent"]["name"]
+          subdomain      = zone["name"]
+          subdomain_full = format("%s.%s", zone["name"], v["hosted_zone_subdomains_parent"]["name"])
+          is_enabled     = true
         }
       ]
     }

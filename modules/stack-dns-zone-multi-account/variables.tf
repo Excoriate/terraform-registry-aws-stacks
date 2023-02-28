@@ -31,11 +31,11 @@ EOF
 Custom input variables
 -------------------------------------
 */
-variable "master_account_config" {
+variable "master_zone_config" {
   type = object({
     domain                 = string
     target_env             = string
-    environments_to_create = list(object({ name = string, name_servers = list(string), ttl = number }))
+    environments_to_create = optional(list(object({ name = string, name_servers = list(string), ttl = number })), [])
     enable_certificate     = optional(bool, false)
   })
   default     = null
@@ -57,11 +57,12 @@ selectively create the resources for the target environment.
 EOF
 }
 
-variable "environments_config" {
+variable "environment_zones_config" {
   type = list(object({
-    subdomain          = string
-    target_env         = string
-    enable_certificate = optional(bool, false)
+    subdomain                   = string
+    target_env                  = string
+    enable_certificate          = optional(bool, false)
+    enable_certificate_per_zone = optional(bool, false)
     child_zones = list(object({
       name = string
       ttl  = number
@@ -69,21 +70,26 @@ variable "environments_config" {
   }))
   default     = null
   description = <<EOF
-This configuration allow to create a child hosted zone for each environment.
-It also supports the creation of a certificate for the domain.
-The 'child_zones' attribute is a list of objects that contains the name of the child zone and the TTL:
+This configuration allow to create a child hosted zone for each environment. The current attributes supported:
+- subdomain: The subdomain name of the hosted zone.
+- target_env: An special attribute that's used to compare with the `environment` input variable, in order to
+selectively create the resources for the target environment.
+- enable_certificate: Whether to create a certificate for the domain.
+- enable_certificate_per_zone: Whether to create a certificate for each child zone.
+- child_zones: A list of objects that contains the name of the child zone and the TTL.
 E.g.:
 {
   child_zones = [
     {
-      name = "api"
+      name = "child-zone-1"
       ttl  = 300
     },
     {
-      name = "www"
+      name = "child-zone-2"
       ttl  = 300
     }
   ]
+}
 EOF
 }
 
