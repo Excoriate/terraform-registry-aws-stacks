@@ -11,12 +11,140 @@ content: |-
     2. Several "child accounts where it's possible to create environment-specifics `subdomains` (e.g. `dev`, `staging`, `prod`).
     3. Optionally, in each of these environment-specific accounts, it's possible to create "child zones" which are used to separate resource types, e.g. `api`, `web`, `db`, etc.
 
+    ### How to ensure a prooper configuration
+    Sadly, isn't the entire process fully automated in a 1-step fashion, due to natural Terraform limitations. Please, ensure that you're following these steps:
+    1. First, ensure that the `master` zone is created.
+    2. In the `master` account, pass the NS records that'll hold each `subdomain` per each `environment` (in childs AWS accounts) needed.
+    E.g.: (from Terragrunt)
+    ```hcl
+      master_zone_config = {
+        domain = local.domain
+        enable_certificate = true
+        target_env = include.parent.locals.deployment_environment // same environment. E.g.: master
+        environments_to_create = []
+      }
+    ```
+    >Note: The current module already support built-in ACM certificates. If the `enable_certificate` is set to `true`, the module will create a certificate for the `subdomain` and the `apex_domain` (e.g. `example.com`).
+    3. Per each `subdomain`, it's required to create an object within the `environments_to_create` list, with the following attributes:
+    - `name`: the name of the `subdomain` (e.g. `sandbox`, `dev`, `staging`, `prod`).
+    - `name_servers`: the list of `NS` records that'll be used to override the `master` account's `NS` records.
+    - `ttl`: the TTL for the `NS` records.
+    4. Normally, the `name_servers` per each subdomain aren't set in the step 3. You have to create them first in their specific AWS child accounts, and obtain from there their `NS` records. This is a manual step, and it's required to be done before the step 6.
+    5. Create the DNS configuration only applying the changes for the hosted zone first. The ACM certificate will fail in this step if it's created, since it can't be validated if the NS records aren't replaced into the `master` account.
+    ```hcl
+      environment_zones_config = [
+      {
+        subdomain  = "dev.example.com"
+        target_env = "dev"
+        child_zones = [
+          {
+            name : "api"
+            ttl = 300
+          },
+          {
+            name : "web"
+            ttl = 300
+          }
+        ]
+      },
+      {
+        subdomain                   = "stage.example.com"
+        target_env                  = "stage"
+        enable_certificate          = false
+        enable_certificate_per_zone = false
+        child_zones = [
+          {
+            name : "api"
+            ttl = 300
+          },
+          {
+            name : "web"
+            ttl = 300
+          }
+        ]
+      }
+    ]
+
+      environment = "stage"
+    ```
+    6. Once you have the `NS` records for each `subdomain`, you can pass them to the `master` account, and create the `subdomain` in the `master` account. E.g.:
+    ```hcl
+      master_zone_config = {
+        domain = local.domain
+        enable_certificate = true
+        target_env = include.parent.locals.deployment_environment // same environment. E.g.: master
+        environments_to_create = [
+          {
+            name = "sandbox"
+            name_servers = [
+              "ns-1498.awsdns-22.org.",
+              "ns-391.awsdns-11.com.",
+              "ns-983.awsdns-00.net.",
+              "ns-1811.awsdns-21.co.uk."
+            ]
+            ttl = local.ttl
+          },
+        ]
+      }
+    ```
+    7. When the zones are created, and their respective NS records are replaced into the master account, you can apply the changes in each AWS child account but this time enabling the `certificate` creation:
+    ```hcl
+      environment_zones_config = [
+      {
+        subdomain  = "dev.example.com"
+        target_env = "dev"
+        child_zones = [
+          {
+            name : "api"
+            ttl = 300
+          },
+          {
+            name : "web"
+            ttl = 300
+          }
+        ]
+        },
+        {
+        subdomain                   = "stage.example.com"
+        target_env                  = "stage"
+        enable_certificate          = true
+        enable_certificate_per_zone = true
+        child_zones = [
+          {
+            name : "api"
+            ttl = 300
+          },
+          {
+            name : "web"
+            ttl = 300
+          }
+        ]
+      }
+    ]
+
+      environment = "stage"
+    ```
+
     ---
     ## Example
     Examples of this module's usage are available in the [examples](./examples) folder.
 
     ```hcl
-    {{ include "../../examples/stack-alb-http/basic/main.tf" }}
+    {{ include "../../examples/stack-dns-zone-multi-account/basic/main.tf" }}
+    ```
+    An example of a very simple configuration:
+    ```hcl
+    {{ include "../../examples/stack-dns-zone-multi-account/basic/config/fixtures.tfvars" }}
+    ```
+
+    A configuration that includes "child" zones, meaning environments in AWS managed accounts:
+    ```hcl
+    {{ include "../../examples/stack-dns-zone-multi-account/basic/config/fixtures-environment-zones.tfvars" }}
+    ```
+
+    A configuration for a `master` account, with ACM certificates included:
+    ```hcl
+    {{ include "../../examples/stack-dns-zone-multi-account/basic/config/fixtures-master-with-certificate.tfvars" }}
     ```
 
     For module composition, It's recommended to take a look at the module's `outputs` to understand what's available:

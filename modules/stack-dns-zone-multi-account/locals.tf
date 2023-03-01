@@ -54,7 +54,15 @@ locals {
     }
   }
 
+  // It only filters the subdomains that are marked as 'certificate' compatibles.
   tsl_certs_per_subdomain = !local.is_envs_config_enabled ? {} : {
+    for k, v in local.envs_to_create : k => {
+      subdomain  = v["hosted_zone_subdomains_parent"]["name"]
+      is_enabled = true
+    } if v["enable_certificate"]
+  }
+
+  tsl_certs_per_child_zone = !local.is_envs_config_enabled ? {} : {
     for k, v in local.envs_to_create : k => {
       subdomain  = v["hosted_zone_subdomains_parent"]["name"]
       is_enabled = true
@@ -66,6 +74,6 @@ locals {
           is_enabled     = true
         }
       ]
-    }
+    } if v["enable_certificate_per_zone"]
   }
 }
