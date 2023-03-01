@@ -92,13 +92,3 @@ E.g.:
 }
 EOF
 }
-
-variable "environments_to_protect_from_destroy" {
-  type        = list(string)
-  default     = []
-  description = <<EOF
-This special input variable set the 'environments' that are protected from being destroyed. This variable is
-used when the hosted zone is created, in order to set the 'force_destroy' attribute to 'false' for the
-environments that are protected from being destroyed.
-EOF
-}
