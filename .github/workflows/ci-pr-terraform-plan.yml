@@ -22,8 +22,8 @@ jobs:
                       module: default
                       tf_version: 1.3.6
 
-                    - name: basic
-                      module: vpc
+                    - name: dns-zone-multi-account
+                      module: stack-dns-zone-multi-account
                       tf_version: 1.3.6
 
         defaults:
@@ -66,8 +66,8 @@ jobs:
                       module: default
                       tf_version: 1.3.6
 
-                    - name: basic
-                      module: vpc
+                    - name: dns-zone-multi-account
+                      module: stack-dns-zone-multi-account
                       tf_version: 1.3.6
         defaults:
             run:
