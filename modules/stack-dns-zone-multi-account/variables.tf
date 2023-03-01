@@ -33,10 +33,14 @@ Custom input variables
 */
 variable "master_zone_config" {
   type = object({
-    domain                 = string
-    target_env             = string
-    environments_to_create = optional(list(object({ name = string, name_servers = list(string), ttl = number })), [])
-    enable_certificate     = optional(bool, false)
+    domain     = string
+    target_env = string
+    environments_to_create = optional(list(object({
+      name         = string,
+      name_servers = list(string),
+      ttl          = number
+    })), [])
+    enable_certificate = optional(bool, false)
   })
   default     = null
   description = <<EOF

@@ -43,8 +43,7 @@ locals {
 
       hosted_zone_subdomains_childs = [
         for zone in env["zones_config"] : {
-          domain = lookup(env["subdomain_config"], "name")
-          #          name              = format("%s.%s", zone["name"], lookup(env["subdomain_config"], "name"))
+          domain            = lookup(env["subdomain_config"], "name")
           name              = zone["name"]
           comment           = format("Hosted zone for %s environment", env["target_env"])
           force_destroy     = lookup(zone, "force_destroy")

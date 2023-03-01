@@ -1,6 +1,6 @@
 module "master_hosted_zone" {
   count      = !local.is_master_config_enabled ? 0 : 1
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.8.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.10.0"
   aws_region = var.aws_region
   is_enabled = local.is_master_config_enabled
 
@@ -25,7 +25,7 @@ module "master_hosted_zone" {
 
 module "master_certificate" {
   count      = !local.is_master_tls_certificate_enabled ? 0 : 1
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.8.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.9.0"
   aws_region = var.aws_region
   is_enabled = local.is_master_tls_certificate_enabled
 
@@ -39,6 +39,15 @@ module "master_certificate" {
     }
   ]
 
+  acm_validation_config = [
+    {
+      name        = "master-acm-certificate"
+      domain_name = var.master_zone_config.domain
+      zone_name   = var.master_zone_config.domain
+      ttl         = 60
+    }
+  ]
+
   depends_on = [
     module.master_hosted_zone
   ]
@@ -46,7 +55,7 @@ module "master_certificate" {
 
 module "envs_hosted_zones" {
   for_each   = local.envs_to_create
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.8.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-hosted-zone?ref=v1.9.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -56,7 +65,7 @@ module "envs_hosted_zones" {
 
 module "envs_certificates" {
   for_each   = local.tsl_certs_per_subdomain
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.8.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.9.0"
   aws_region = var.aws_region
   is_enabled = each.value["is_enabled"]
 
@@ -66,6 +75,10 @@ module "envs_certificates" {
       domain_name                 = each.value["subdomain"]
       wait_for_certificate_issued = true
       subject_alternative_names   = [format("*.%s", each.value["subdomain"])]
+      validation_config = {
+        name      = format("%s-acm-certificate", each.value["subdomain"])
+        zone_name = each.value["subdomain"]
+      }
     }
   ]
 
@@ -76,7 +89,7 @@ module "envs_certificates" {
 
 module "envs_certificates_per_zone" {
   for_each   = { for k, v in local.tsl_certs_per_subdomain : k => v if length(v["child_zones"]) > 0 }
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.8.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/acm-certificate?ref=v1.9.0"
   aws_region = var.aws_region
   is_enabled = each.value["is_enabled"]
 
@@ -86,6 +99,10 @@ module "envs_certificates_per_zone" {
       domain_name                 = zone["subdomain_full"]
       wait_for_certificate_issued = true
       subject_alternative_names   = [format("*.%s", zone["subdomain_full"])]
+      validation_config = {
+        name      = format("%s-acm-certificate", zone["subdomain_full"])
+        zone_name = zone["subdomain_full"]
+      }
     }
   ]
 
