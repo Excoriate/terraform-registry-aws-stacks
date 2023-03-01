@@ -20,8 +20,10 @@ Custom outputs
 */
 output "feature_flags" {
   value = {
-    is_enabled                = var.is_enabled
-    is_master_account_enabled = local.is_master_config_enabled
+    is_enabled                           = var.is_enabled
+    is_master_account_enabled            = local.is_master_config_enabled
+    is_master_ns_records_per_env_enabled = local.is_master_environment_ns_records_enabled
+    is_envs_zones_enabled                = local.is_envs_config_enabled
   }
   description = "Describes the feature flags used by this module and their status."
 }
