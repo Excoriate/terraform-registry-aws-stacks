@@ -6,10 +6,7 @@
 
 ---
 
-[![auto-release](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/auto-release.yml/badge.svg)](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/auto-release.yml)
-[![Run pre-commit](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-check-precommit.yml/badge.svg)](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-check-precommit.yml)
-[![Terraform Check](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-check-terraform.yml/badge.svg)](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-check-terraform.yml)
-[![Terraform Plan on PR](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-pr-terraform-plan.yml/badge.svg)](https://github.com/Excoriate/-terraform-registry-aws-network/actions/workflows/ci-pr-terraform-plan.yml)
+[![Run pre-commit](https://github.com/Excoriate/terraform-registry-aws-stacks/actions/workflows/ci-check-precommit.yml/badge.svg)](https://github.com/Excoriate/terraform-registry-aws-stacks/actions/workflows/ci-check-precommit.yml)[![Terraform Check](https://github.com/Excoriate/terraform-registry-aws-stacks/actions/workflows/ci-check-terraform.yml/badge.svg)](https://github.com/Excoriate/terraform-registry-aws-stacks/actions/workflows/ci-check-terraform.yml)
 
 ## Table of Contents
 
