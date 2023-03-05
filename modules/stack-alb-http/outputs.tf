@@ -18,4 +18,7 @@ output "tags_set" {
 Custom outputs
 -------------------------------------
 */
-// FIXME: Remove, refactor or change. (Template)
+output "stack_network_configuration" {
+  value       = module.network_data
+  description = "The network configuration for the stack."
+}
