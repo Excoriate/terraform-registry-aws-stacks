@@ -1,11 +1,12 @@
 locals {
   aws_region_to_deploy = var.aws_region
 
-  /**
+  /*
    * Feature flags
-   * - is_enabled: enable/disable the entire module
-   */
-  is_enabled = var.is_enabled
+  */
+  is_enabled       = var.is_enabled
+  is_http_enabled  = !local.is_enabled ? false : var.http_config.enable_http
+  is_https_enabled = !local.is_enabled ? false : var.http_config.enable_https
 
   tags = local.is_enabled ? merge(
     {
@@ -37,4 +38,7 @@ locals {
 
 
   vpc_name_normalised = !local.is_enabled ? null : lower(trimspace(var.vpc_name))
+  // The domain name and the zone_name for this purpose are the same.
+  domain_name_normalised = !local.is_enabled ? null : lower(trimspace(var.http_config.domain))
+  zone_name_normalised   = !local.is_enabled ? null : lower(trimspace(local.domain_name_normalised))
 }
