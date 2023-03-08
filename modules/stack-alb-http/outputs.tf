@@ -56,3 +56,8 @@ output "stack_zone_id" {
   value       = local.zone_id
   description = "The ID of the Route53 zone."
 }
+
+output "stack_listeners" {
+  value       = module.alb_listeners
+  description = "The listeners configured for the Application Load Balancer."
+}

@@ -52,3 +52,8 @@ output "stack_zone_id" {
   value       = module.main_module.stack_zone_id
   description = "The ID of the Route53 zone."
 }
+
+output "stack_listeners" {
+  value       = module.main_module.stack_listeners
+  description = "The listeners configured for the Application Load Balancer."
+}

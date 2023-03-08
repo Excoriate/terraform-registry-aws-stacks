@@ -9,17 +9,18 @@ locals {
   subnet_az_b_id = lookup(local.subnet_public_az_b, "id")
   subnet_az_c_id = lookup(local.subnet_public_az_c, "id")
 
-  certificate_data       = !local.is_enabled ? null : lookup(module.network_data[local.stack]["dns_data_acm_certificate"], local.domain_name_normalised)
-  zone_data              = !local.is_enabled ? null : lookup(module.network_data[local.stack]["dns_data_hosted_zone"], local.domain_name_normalised)
-  certificate_arn        = lookup(local.certificate_data, "arn")
-  certificate_ssl_policy = !local.is_enabled ? null : local.certificate_arn == null ? null : "ELBSecurityPolicy-2016-08"
-  zone_id                = lookup(local.zone_data, "id")
+  certificate_data = !local.is_enabled ? null : lookup(module.network_data[local.stack]["dns_data_acm_certificate"], local.domain_name_normalised)
+  zone_data        = !local.is_enabled ? null : lookup(module.network_data[local.stack]["dns_data_hosted_zone"], local.domain_name_normalised)
+  certificate_arn  = lookup(local.certificate_data, "arn")
+  zone_id          = lookup(local.zone_data, "id")
 }
 
-// 1. Lookup for required network data (VPC, and subnets)
+// ***************************************
+// 1. Fetch VPC and network-related data.
+// ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.19.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.20.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -41,10 +42,12 @@ module "network_data" {
   tags = local.tags
 }
 
-// 2. Create a security group for the ALB
+// ***************************************
+// 2. ALB security groups
+// ***************************************
 module "alb_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.19.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.20.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -72,10 +75,12 @@ module "alb_security_group" {
   tags = local.tags
 }
 
-// 3. Create the ALB. If it's set as internet facing, lookup for the public subnets
+// ***************************************
+// 3. Application load balancer
+// ***************************************
 module "alb" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.19.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.20.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -95,14 +100,16 @@ module "alb" {
   tags = local.tags
 }
 
-// 4. "Target group" for the ALB.
+// ***************************************
+// 4. Target group
+// ***************************************
 locals {
   // 4.1. Create a target group for the ALB for HTTP traffic.
   target_group_defaults = {
     vpc_id           = local.vpc_id
-    protocol_version = "HTTP2"
-    protocol         = "TCP"
+    protocol_version = "HTTP1"
     slow_start       = var.alb_targets_warmup_time
+    target_type      = "ip"
   }
 
   // 4.2. Opinionated defaults for the health check.
@@ -114,13 +121,14 @@ locals {
     matcher             = "200-299"
     timeout             = var.health_check_config.timeout
     interval            = var.health_check_config.interval
+    port                = var.health_check_config.backend_port
   }
 }
 
 module "alb_target_group" {
   for_each = local.stack_config_map
-  #  source     = "../../../terraform-registry-aws-networking/modules/target-group"
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.19.0"
+  #    source     = "../../../terraform-registry-aws-networking/modules/target-group"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.20.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -132,7 +140,6 @@ module "alb_target_group" {
       protocol = "HTTP"
       health_check = merge({
         protocol = "HTTP"
-        port     = 80
       }, local.target_group_health_check_defaults)
     }, local.target_group_defaults),
     // 4.2. Create a target group for the ALB for HTTPS traffic.
@@ -142,7 +149,6 @@ module "alb_target_group" {
       protocol = "HTTPS"
       health_check = merge({
         protocol = "HTTPS"
-        port     = 443
       }, local.target_group_health_check_defaults)
     }, local.target_group_defaults)
   ]
@@ -154,27 +160,48 @@ module "alb_target_group" {
   tags = local.tags
 }
 
-#module "alb_listeners"{
-#  for_each  = !local.is_http_enabled && !local.is_https_enabled ? {} : local.stack_config_map
-#  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.18.0"
-#  aws_region = var.aws_region
-#  is_enabled = var.is_enabled
-#
-#  alb_listeners_config = [
-#    {
-#      alb_arn             = module.alb[local.stack]["alb_arn"]
-#      port                = 80
-#      protocol            = "HTTP"
-#      default_action = {
-#        type "forward"
-#        target_group_arn = null
-#      }
-#    }
-#  ]
-#
-#  depends_on = [
-#    module.alb
-#  ]
-#
-#  tags = local.tags
-#}
+// ***************************************
+// 5. ALB listeners
+// ***************************************
+locals {
+  // 5.1. Create a target group for the ALB for HTTP traffic.
+  listener_defaults = {
+    alb_arn = join("", [for alb in data.aws_alb.this : alb.arn])
+  }
+
+  // 5.2 Handy to get the target group ARN through data sources.
+  target_group_name_http  = !local.is_http_enabled ? null : format("%s-alb-tg-http", local.stack_full)
+  target_group_name_https = !local.is_https_enabled ? null : format("%s-alb-tg-https", local.stack_full)
+  target_group_http_arn   = !local.is_http_enabled ? null : join("", [for tg in data.aws_alb_target_group.tg_http : tg.arn])
+  target_group_https_arn  = !local.is_https_enabled ? null : join("", [for tg in data.aws_alb_target_group.tg_https : tg.arn])
+}
+
+module "alb_listeners" {
+  for_each   = !local.is_http_enabled && !local.is_https_enabled ? {} : local.stack_config_map
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.20.0"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  alb_listener_ooo_http = !local.is_http_enabled ? [] : [
+    !local.is_http_enabled ? null : merge({
+      name             = format("%s-alb-listener-http", local.stack_full)
+      target_group_arn = local.target_group_http_arn
+    }, local.listener_defaults)
+  ]
+
+  alb_listener_ooo_https = !local.is_https_enabled ? [] : [
+    !local.is_https_enabled ? null : merge({
+      name             = format("%s-alb-listener-https", local.stack_full)
+      certificate_arn  = local.certificate_arn
+      target_group_arn = local.target_group_https_arn
+    }, local.listener_defaults)
+  ]
+
+  tags = local.tags
+
+  depends_on = [
+    data.aws_alb_target_group.tg_http,
+    data.aws_alb_target_group.tg_https,
+    data.aws_alb.this
+  ]
+}

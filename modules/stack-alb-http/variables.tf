@@ -76,9 +76,10 @@ For more information, please refer to the following link: https://registry.terra
 
 variable "health_check_config" {
   type = object({
-    timeout   = optional(number, 5)
-    interval  = optional(number, 30)
-    threshold = optional(number, 5)
+    timeout      = optional(number, 5)
+    interval     = optional(number, 30)
+    threshold    = optional(number, 5)
+    backend_port = number
   })
   description = <<EOF
   Configuration for the health check. Current allowed attributes are:
@@ -86,10 +87,12 @@ variable "health_check_config" {
   - interval: The approximate amount of time, in seconds, between health checks of an individual target. Default is 30.
   - threshold: The number of consecutive health check failures required before considering a target unhealthy. Default is 5.
   Each of these attributes maps to the target_group configuration attribute 'health_check'.
+  - backend_port: The port to use for the health check. Default is 8080.
   EOF
   default = {
-    timeout   = 3
-    interval  = 30
-    threshold = 3
+    timeout      = 3
+    interval     = 30
+    threshold    = 3
+    backend_port = 8080
   }
 }
