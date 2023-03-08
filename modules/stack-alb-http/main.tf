@@ -20,7 +20,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.21.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -47,14 +47,14 @@ module "network_data" {
 // ***************************************
 module "alb_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.21.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
   security_group_config = [
     {
       name        = format("%s-alb-sg", local.stack_full)
-      description = format("Firewall test 1 for %s stack", local.stack_full)
+      description = format("Firewall set of rules for %s stack", local.stack_full)
       vpc_id      = local.vpc_id
     }
   ]
@@ -80,7 +80,7 @@ module "alb_security_group" {
 // ***************************************
 module "alb" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.21.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -128,7 +128,7 @@ locals {
 module "alb_target_group" {
   for_each = local.stack_config_map
   #    source     = "../../../terraform-registry-aws-networking/modules/target-group"
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.21.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -178,7 +178,7 @@ locals {
 
 module "alb_listeners" {
   for_each   = !local.is_http_enabled && !local.is_https_enabled ? {} : local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.21.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 

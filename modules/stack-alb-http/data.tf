@@ -18,6 +18,7 @@ data "aws_alb_target_group" "tg_https" {
 
 data "aws_alb" "this" {
   for_each = !local.is_enabled ? {} : { enabled = true }
+  name     = format("%s-alb", local.stack_full)
 
   depends_on = [
     module.alb
