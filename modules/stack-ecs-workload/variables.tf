@@ -88,3 +88,23 @@ This variable defines the ecs service name, and the name of the task definition.
 it should also represent the service/app that's being deployed.
 EOF
 }
+
+variable "container_config" {
+  type = object({
+    image                 = string
+    memory                = number
+    cpu                   = number
+    essential             = optional(bool, true)
+    environment_variables = optional(list(map(string)), [])
+  })
+  description = <<EOF
+  Configuration for the container. Current allowed attributes are:
+  - image: The image to use for the container.
+  - memory: The amount of memory (in MiB) to allow the container to use.
+  - cpu: The number of cpu units to reserve for the container.
+  - essential: Whether the container is essential or not. Default is true.
+  - environment_variables: A list of maps that contains the environment variables.
+    - name: The name of the environment variable.
+    - value: The value of the environment variable.
+EOF
+}

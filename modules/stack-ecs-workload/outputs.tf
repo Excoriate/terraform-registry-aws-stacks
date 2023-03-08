@@ -37,3 +37,9 @@ output "stack_log_group_data" {
   value       = module.ecs_log_group
   description = "The stack log group data."
 }
+
+output "stack_container_definition" {
+  value       = module.ecs_container_definition
+  description = "The stack container definition."
+  sensitive   = true
+}

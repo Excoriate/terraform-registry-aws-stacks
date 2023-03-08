@@ -37,3 +37,9 @@ output "stack_log_group_data" {
   value       = module.main_module.stack_log_group_data
   description = "The stack log group data."
 }
+
+output "stack_container_definition" {
+  value       = module.main_module.stack_container_definition
+  description = "The stack container definition."
+  sensitive   = true
+}

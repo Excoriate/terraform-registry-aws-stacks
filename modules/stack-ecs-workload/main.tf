@@ -89,3 +89,21 @@ module "ecs_log_group" {
 // ***************************************
 // 4. Container definition
 // ***************************************
+module "ecs_container_definition" {
+  for_each = local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.3.0"
+
+  container_image  = var.container_config.image
+  container_name   = local.workload_name_normalised
+  container_memory = var.container_config.memory
+  container_cpu    = var.container_config.cpu
+  essential        = var.container_config.essential
+  environment      = var.container_config.environment_variables
+  port_mappings = [
+    {
+      containerPort = var.port_config.container_port
+      hostPort      = var.port_config.container_port
+      protocol      = "tcp"
+    }
+  ]
+}

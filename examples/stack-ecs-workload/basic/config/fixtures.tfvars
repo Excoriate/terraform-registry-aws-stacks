@@ -18,3 +18,9 @@ http_config = {
 cluster       = "tsn-sandbox-us-east-1-frontend-workload-web-ecs-fargate"
 alb_name      = "stack-test-alb"
 workload_name = "auth-svc"
+
+container_config = {
+  image  = "nginx:latest"
+  memory = 256
+  cpu    = 256
+}
