@@ -53,3 +53,8 @@ output "stack_ecs_task_role" {
   value       = module.main_module.stack_ecs_task_role
   description = "The stack ECS task role."
 }
+
+output "stack_ecs_task_definition" {
+  value       = module.main_module.stack_ecs_task_definition
+  description = "The stack ECS task."
+}

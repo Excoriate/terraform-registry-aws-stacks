@@ -21,6 +21,6 @@ workload_name = "auth-svc"
 
 container_config = {
   image  = "nginx:latest"
-  memory = 256
+  memory = 512
   cpu    = 256
 }

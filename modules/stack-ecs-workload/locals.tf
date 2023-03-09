@@ -50,8 +50,8 @@ locals {
     * 1. ECS execution role is used by ECS to run tasks on the EC2 instances.
     * 2. ECS task role is used by the containers to access AWS resources.
   */
-  container_exec_role_name = format("role-exec-%s", local.workload_name_normalised)
-  container_task_role_name = format("role-task-%s", local.workload_name_normalised)
+  container_exec_role_name = format("role-%s-%s", local.stack_full, local.workload_name_normalised)
+  container_task_role_name = format("role-%s-%s", local.stack_full, local.workload_name_normalised)
 
 
   // 2. ECS task role (and permissions)
