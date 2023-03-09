@@ -96,6 +96,12 @@ variable "container_config" {
     cpu                   = number
     essential             = optional(bool, true)
     environment_variables = optional(list(map(string)), [])
+    permissions = optional(list(object({
+      type        = optional(string, "Allow")
+      policy_name = string
+      actions     = list(string)
+      resources   = optional(list(string), ["*"])
+    })), null)
   })
   description = <<EOF
   Configuration for the container. Current allowed attributes are:
@@ -106,5 +112,10 @@ variable "container_config" {
   - environment_variables: A list of maps that contains the environment variables.
     - name: The name of the environment variable.
     - value: The value of the environment variable.
+  - permissions: A list of objects that contains the permissions for the container.
+    - policy_name: The name of the policy.
+    - type: The type of permission. Default is Allow.
+    - actions: A list of actions that the container can perform.
+    - resources: A list of resources that the container can access.
 EOF
 }

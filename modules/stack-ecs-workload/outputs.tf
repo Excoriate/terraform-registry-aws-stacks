@@ -43,3 +43,13 @@ output "stack_container_definition" {
   description = "The stack container definition."
   sensitive   = true
 }
+
+output "stack_ecs_execution_role" {
+  value       = module.ecs_execution_role
+  description = "The stack ECS execution role."
+}
+
+output "stack_ecs_task_role" {
+  value       = module.ecs_task_role
+  description = "The stack ECS task role."
+}

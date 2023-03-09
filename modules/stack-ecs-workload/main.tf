@@ -91,7 +91,7 @@ module "ecs_log_group" {
 // ***************************************
 module "ecs_container_definition" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.3.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.6.0"
 
   container_image  = var.container_config.image
   container_name   = local.workload_name_normalised
@@ -106,4 +106,84 @@ module "ecs_container_definition" {
       protocol      = "tcp"
     }
   ]
+
+  log_configuration = {
+    logDriver = "awslogs"
+    options = {
+      "awslogs-group"         = local.cloudwatch_log_group_name
+      "awslogs-region"        = var.aws_region
+      "awslogs-stream-prefix" = format("log-%s", local.workload_name_normalised)
+    }
+  }
+
+  depends_on = [
+    module.ecs_log_group
+  ]
 }
+
+// ***************************************
+// 6. ECS task execution role
+// ***************************************
+module "ecs_execution_role" {
+  for_each = local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.6.0"
+  #  source   = "../../../terraform-registry-aws-containers/modules/ecs-roles"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  execution_role_ooo_config = [
+    {
+      name                    = local.container_exec_role_name
+      role_name               = local.container_exec_role_name
+      enable_ooo_role_fargate = true
+    }
+  ]
+}
+
+// ***************************************
+// 7. ECS task role
+// ***************************************
+module "ecs_task_role" {
+  for_each = local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.6.0"
+  #  source   = "../../../terraform-registry-aws-containers/modules/ecs-roles"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  task_role_config = [
+    {
+      name      = local.container_task_role_name
+      role_name = local.container_task_role_name
+    }
+  ]
+
+  task_role_permissions_config = local.task_permissions
+}
+
+
+
+
+#// ***************************************
+#// 8. ECS task definition
+#// ***************************************
+#module "ecs_task_definition" {
+#  for_each   = local.stack_config_map
+#  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task?ref=v0.4.0"
+##  source   = "../../../terraform-registry-aws-containers/modules/ecs-task"
+#  aws_region = var.aws_region
+#  is_enabled = var.is_enabled
+#
+#  task_config = [
+#    {
+#      name = local.stack_full
+#      family = format("task-def-%s", local.workload_name_normalised)
+#      cpu = var.container_config.cpu
+#      memory = var.container_config.memory
+#      network_mode = "awsvpc"
+#      container_definition_from_json = module.ecs_container_definition[local.stack].json_map_encoded_list
+#      enable_default_permissions = true
+#    }
+#  ]
+#
+#  tags = local.tags
+#}

@@ -44,4 +44,33 @@ locals {
   ecs_service_name_normalised = !local.is_enabled ? null : lower(trimspace(format("%s-ecs", var.workload_name)))
   cluster_name_normalised     = !local.is_enabled ? null : lower(trimspace(var.cluster))
   cloudwatch_log_group_name   = !local.is_enabled ? null : format("/aws/ecs/%s/%s-logs", local.cluster_name_normalised, local.ecs_service_name_normalised)
+
+  /*
+    * Configuration for the ECS execution role, and ECS Task role.
+    * 1. ECS execution role is used by ECS to run tasks on the EC2 instances.
+    * 2. ECS task role is used by the containers to access AWS resources.
+  */
+  container_exec_role_name = format("role-exec-%s", local.workload_name_normalised)
+  container_task_role_name = format("role-task-%s", local.workload_name_normalised)
+
+
+  // 2. ECS task role (and permissions)
+  task_permissions = !local.is_enabled ? null : var.container_config["permissions"] == null ? [{
+    resources                      = ["*"]
+    policy_name                    = format("pol-default-%s", local.workload_name_normalised)
+    role_name                      = local.container_task_role_name
+    merge_with_default_permissions = true
+    actions                        = ["*"]
+    type                           = "Allow"
+    }] : [
+    for permission in var.container_config["permissions"] :
+    {
+      resources                      = permission["resources"]
+      policy_name                    = trimspace(permission["policy_name"])
+      role_name                      = local.container_task_role_name
+      merge_with_default_permissions = true
+      actions                        = permission["actions"]
+      type                           = permission["type"]
+    }
+  ]
 }
