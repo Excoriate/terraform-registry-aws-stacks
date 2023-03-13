@@ -58,3 +58,12 @@ output "stack_ecs_task_definition" {
   value       = module.ecs_task_definition
   description = "The stack ECS task."
 }
+
+output "stack_ecs_alb_attachment" {
+  value = {
+    tg_to_attach          = local.target_groups_to_attach
+    is_attachment_enabled = local.is_alb_attachment_by_ecs_enabled
+    tg_resolved_data      = local.ecs_load_balancers_config
+  }
+  description = "The stack ECS ALB attachment."
+}

@@ -73,4 +73,21 @@ locals {
       type                           = permission["type"]
     }
   ]
+
+  /*
+    * The 'tag' is also propagated, however it's an optional value. If it's passed, it'll be used.
+  */
+  container_image_url_include_tag = !local.is_enabled ? false : length(split(":", trimspace(var.container_config.image_url))) > 1
+  image_url                       = local.container_image_url_include_tag ? split(":", trimspace(var.container_config.image_url))[0] : trimspace(var.container_config.image_url)
+  image_tag                       = local.container_image_url_include_tag ? split(":", trimspace(var.container_config.image_url))[1] : var.container_config.image_tag == null ? "latest" : trimspace(var.container_config.image_tag)
+  container_image                 = format("%s:%s", local.image_url, local.image_tag)
+
+  is_alb_attachment_by_ecs_enabled = !local.is_enabled ? false : var.attach_ingress_alb_target_group_by_name == null ? false : length(var.attach_ingress_alb_target_group_by_name) > 0 ? true : false
+  target_groups_to_attach = !local.is_alb_attachment_by_ecs_enabled ? {} : {
+    for tg in var.attach_ingress_alb_target_group_by_name :
+    tg => {
+      stack = local.stack
+      name  = tg
+    }
+  }
 }

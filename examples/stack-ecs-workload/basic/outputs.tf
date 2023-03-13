@@ -58,3 +58,8 @@ output "stack_ecs_task_definition" {
   value       = module.main_module.stack_ecs_task_definition
   description = "The stack ECS task."
 }
+
+output "stack_ecs_alb_attachment" {
+  value       = module.main_module.stack_ecs_alb_attachment
+  description = "The stack ECS ALB attachment."
+}

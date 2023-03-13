@@ -20,7 +20,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.22.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -47,7 +47,7 @@ module "network_data" {
 // ***************************************
 module "alb_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.22.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -80,7 +80,7 @@ module "alb_security_group" {
 // ***************************************
 module "alb" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.22.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -115,7 +115,7 @@ locals {
   // 4.2. Opinionated defaults for the health check.
   target_group_health_check_defaults = {
     enabled             = true
-    path                = "/"
+    path                = var.health_check_config.path
     healthy_threshold   = var.health_check_config.threshold
     unhealthy_threshold = var.health_check_config.threshold
     matcher             = "200-299"
@@ -128,7 +128,7 @@ locals {
 module "alb_target_group" {
   for_each = local.stack_config_map
   #    source     = "../../../terraform-registry-aws-networking/modules/target-group"
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.22.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -178,7 +178,7 @@ locals {
 
 module "alb_listeners" {
   for_each   = !local.is_http_enabled && !local.is_https_enabled ? {} : local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.22.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 

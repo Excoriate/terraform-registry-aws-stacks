@@ -34,3 +34,8 @@ data "aws_ecs_cluster" "this" {
   for_each     = !local.is_enabled ? {} : local.stack_config_map
   cluster_name = local.cluster_name_normalised
 }
+
+data "aws_lb_target_group" "tg_to_attach" {
+  for_each = !local.is_alb_attachment_by_ecs_enabled ? {} : local.target_groups_to_attach
+  name     = each.value["name"]
+}

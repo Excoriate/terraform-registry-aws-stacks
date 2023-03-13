@@ -66,6 +66,7 @@ variable "health_check_config" {
     interval     = optional(number, 30)
     threshold    = optional(number, 5)
     backend_port = number
+    path         = optional(string, "/")
   })
   description = <<EOF
   Configuration for the health check. Current allowed attributes are:
@@ -79,6 +80,7 @@ variable "health_check_config" {
     timeout      = 3
     interval     = 30
     threshold    = 3
-    backend_port = 8080
+    backend_port = 80
+    path         = "/"
   }
 }

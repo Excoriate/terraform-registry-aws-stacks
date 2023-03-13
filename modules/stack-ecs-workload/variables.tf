@@ -91,7 +91,8 @@ EOF
 
 variable "container_config" {
   type = object({
-    image                 = string
+    image_url             = string
+    image_tag             = optional(string, null)
     memory                = number
     cpu                   = number
     essential             = optional(bool, true)
@@ -105,7 +106,8 @@ variable "container_config" {
   })
   description = <<EOF
   Configuration for the container. Current allowed attributes are:
-  - image: The image to use for the container.
+  - image_url: The image to use for the container.
+  - image_tag: The image tag to use for the container. Default is null.
   - memory: The amount of memory (in MiB) to allow the container to use.
   - cpu: The number of cpu units to reserve for the container.
   - essential: Whether the container is essential or not. Default is true.
@@ -146,4 +148,13 @@ desiredCount value, that must remain running and healthy in a service during a s
 activity.
 EOF
   default     = 1
+}
+
+variable "attach_ingress_alb_target_group_by_name" {
+  type        = list(string)
+  description = <<EOF
+  If it's passed, it'll look for a valid ALB (existing) target group, and gets its ARN.
+It'll be used to attach the ECS service to the ALB.
+EOF
+  default     = null
 }
