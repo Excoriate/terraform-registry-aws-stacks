@@ -31,7 +31,7 @@ module "network_data" {
 
 locals {
   alb_data  = !local.is_enabled ? null : data.aws_alb.this
-  alb_sg_id = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.this : sg.id])
+  alb_sg_id = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.id])
 }
 
 // ***************************************
@@ -58,6 +58,8 @@ module "ecs_security_group" {
       enable_inbound_https_from_source = local.is_https_enabled
       enable_inbound_http_from_source  = local.is_http_enabled
       source_security_group_id         = local.alb_sg_id
+      enable_outbound_https            = true
+      enable_outbound_http             = true
     }
   ]
 
@@ -91,7 +93,7 @@ module "ecs_log_group" {
 // ***************************************
 module "ecs_container_definition" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.7.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.13.0"
 
   container_image  = var.container_config.image
   container_name   = local.workload_name_normalised
@@ -122,11 +124,11 @@ module "ecs_container_definition" {
 }
 
 // ***************************************
-// 6. ECS task execution role
+// 5. ECS execution role
 // ***************************************
 module "ecs_execution_role" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.7.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.13.0"
   #  source   = "../../../terraform-registry-aws-containers/modules/ecs-roles"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
@@ -141,11 +143,11 @@ module "ecs_execution_role" {
 }
 
 // ***************************************
-// 7. ECS task role
+// 6. ECS task role
 // ***************************************
 module "ecs_task_role" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.7.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles?ref=v0.13.0"
   #  source   = "../../../terraform-registry-aws-containers/modules/ecs-roles"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
@@ -162,17 +164,17 @@ module "ecs_task_role" {
 
 
 
-
 // ***************************************
-// 8. ECS task definition
+// 7. ECS task definition
 // ***************************************
 locals {
   execution_role_arn = join("", [for r in data.aws_iam_role.execution_role : r.arn])
   task_role_arn      = join("", [for r in data.aws_iam_role.task_role : r.arn])
 }
+
 module "ecs_task_definition" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task?ref=v0.7.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task?ref=v0.13.0"
   #  source   = "../../../terraform-registry-aws-containers/modules/ecs-task"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
@@ -185,12 +187,95 @@ module "ecs_task_definition" {
       memory                         = var.container_config.memory
       network_mode                   = "awsvpc"
       container_definition_from_json = module.ecs_container_definition[local.stack].json_map_encoded_list
-      enable_default_permissions     = true
-      // Permissions from a data-source, after the module create these resources.
-      task_role_arn      = local.task_role_arn
-      execution_role_arn = local.execution_role_arn
+    }
+  ]
+
+  task_permissions_config = [
+    {
+      name                         = local.stack_full
+      task_role_arn                = local.task_role_arn
+      execution_role_arn           = local.execution_role_arn
+      disable_built_in_permissions = true
     }
   ]
 
   tags = local.tags
+}
+
+// ***************************************
+// 8. ECS service
+// ***************************************
+locals {
+  cluster             = join("", [for c in data.aws_ecs_cluster.this : c.cluster_name])
+  task_definition_arn = join("", module.ecs_task_definition[local.stack].ecs_task_definition_arn)
+  ecs_security_groups = [for sg in module.ecs_security_group[local.stack].sg_id : sg]
+  ecs_subnets         = [local.subnet_az_a_id, local.subnet_az_b_id, local.subnet_az_c_id]
+}
+
+module "ecs_service" {
+  for_each = local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-service?ref=v0.13.0"
+  #  source   = "../../../terraform-registry-aws-containers/modules/ecs-service"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  ecs_service_config = [
+    {
+      cluster                                  = local.cluster
+      desired_count                            = var.scaling_base_capacity
+      name                                     = local.ecs_service_name_normalised
+      task_definition                          = local.task_definition_arn
+      enable_ignore_changes_on_desired_count   = var.manage_ecs_service_out_of_terraform
+      enable_ignore_changes_on_task_definition = var.manage_ecs_service_out_of_terraform
+      network_config = {
+        mode             = "awsvpc"
+        subnets          = local.ecs_subnets
+        security_groups  = local.ecs_security_groups
+        assign_public_ip = false
+      }
+    }
+  ]
+
+  ecs_service_permissions_config = [
+    {
+      name                         = local.ecs_service_name_normalised
+      execution_role_arn           = local.execution_role_arn
+      disable_built_in_permissions = true
+    }
+  ]
+
+  depends_on = [
+    module.ecs_execution_role,
+    module.ecs_task_role
+  ]
+}
+
+// ***************************************
+// 9. ECS auto-scaling
+// ***************************************
+locals {
+  auto_scaling_resource_id = format("%s/%s", local.cluster_name_normalised, local.ecs_service_name_normalised)
+  auto_scaling_type        = "ecs"
+}
+
+module "ecs_auto_scaling" {
+  for_each = local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/auto-scaling/app-auto-scaling?ref=v0.13.0"
+  #  source   = "../../../terraform-registry-aws-containers/modules/auto-scaling"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  auto_scaling_ecs_config = [
+    {
+      name         = local.stack_full
+      min_capacity = var.scaling_base_capacity
+      max_capacity = var.scaling_up_max_capacity
+      cluster_name = local.cluster_name_normalised
+      service_name = local.ecs_service_name_normalised
+    }
+  ]
+
+  depends_on = [
+    module.ecs_service
+  ]
 }

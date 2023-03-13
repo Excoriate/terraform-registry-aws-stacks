@@ -119,3 +119,31 @@ variable "container_config" {
     - resources: A list of resources that the container can access.
 EOF
 }
+
+variable "manage_ecs_service_out_of_terraform" {
+  type        = bool
+  description = <<EOF
+  Whether to manage the ECS service out of terraform or not. If set to true, the
+  module will not create the ECS service, but it'll create and managet the ecs service
+ignoring changes related to 'desired_count' and 'task_definitions' related changes.
+EOF
+  default     = false
+}
+
+variable "scaling_up_max_capacity" {
+  type        = number
+  description = <<EOF
+  The maximum number of tasks, specified as a percentage of the Amazon ECS service's
+desiredCount value, that can run in a service during a scaling activity.
+EOF
+}
+
+variable "scaling_base_capacity" {
+  type        = number
+  description = <<EOF
+  The minimum number of tasks, specified as a percentage of the Amazon ECS service's
+desiredCount value, that must remain running and healthy in a service during a scaling
+activity.
+EOF
+  default     = 1
+}

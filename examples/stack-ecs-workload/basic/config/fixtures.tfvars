@@ -7,7 +7,7 @@ stack    = "test"
 
 port_config = {
   listening_port = 443
-  container_port = 8080
+  container_port = 80 // testing nginx image.
 }
 
 http_config = {
@@ -24,3 +24,5 @@ container_config = {
   memory = 512
   cpu    = 256
 }
+
+scaling_up_max_capacity = 2
