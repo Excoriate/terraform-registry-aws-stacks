@@ -15,7 +15,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.20.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.23.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -30,8 +30,9 @@ module "network_data" {
 }
 
 locals {
-  alb_data  = !local.is_enabled ? null : data.aws_alb.this
-  alb_sg_id = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.id])
+  alb_data    = !local.is_enabled ? null : data.aws_alb.this
+  alb_sg_id   = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.id])
+  alb_sg_name = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.name])
 }
 
 // ***************************************
@@ -39,7 +40,7 @@ locals {
 // ***************************************
 module "ecs_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.21.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.23.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -253,12 +254,37 @@ module "ecs_service" {
 
   depends_on = [
     module.ecs_execution_role,
-    module.ecs_task_role
+    module.ecs_task_role,
+    module.ecs_security_group
   ]
 }
 
 // ***************************************
-// 9. ECS auto-scaling
+// 9. Allow ALB to reach ECS
+// (this module attach extra rules to the ALB)
+// ***************************************
+locals {
+  ecs_sg_id = !local.is_alb_attachment_by_ecs_enabled ? null : data.aws_security_group.ecs_sg[local.stack].id
+}
+
+resource "aws_security_group_rule" "outbound_traffic_to_ecs_from_alb" {
+  for_each                 = !local.is_alb_attachment_by_ecs_enabled ? {} : local.stack_config_map
+  type                     = "egress"
+  from_port                = var.port_config.container_port
+  to_port                  = var.port_config.container_port
+  protocol                 = "tcp"
+  security_group_id        = local.alb_sg_id
+  source_security_group_id = local.ecs_sg_id
+
+  depends_on = [
+    data.aws_security_group.ecs_sg,
+    data.aws_security_group.alb_sg
+  ]
+}
+
+
+// ***************************************
+// 10. ECS auto-scaling
 // ***************************************
 locals {
   auto_scaling_resource_id = format("%s/%s", local.cluster_name_normalised, local.ecs_service_name_normalised)

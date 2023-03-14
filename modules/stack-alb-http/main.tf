@@ -118,7 +118,7 @@ locals {
     path                = var.health_check_config.path
     healthy_threshold   = var.health_check_config.threshold
     unhealthy_threshold = var.health_check_config.threshold
-    matcher             = "200-299"
+    matcher             = var.health_check_config.matcher
     timeout             = var.health_check_config.timeout
     interval            = var.health_check_config.interval
     port                = var.health_check_config.backend_port

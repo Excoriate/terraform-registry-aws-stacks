@@ -67,6 +67,7 @@ variable "health_check_config" {
     threshold    = optional(number, 5)
     backend_port = number
     path         = optional(string, "/")
+    matcher      = optional(string, "200")
   })
   description = <<EOF
   Configuration for the health check. Current allowed attributes are:
@@ -82,5 +83,6 @@ variable "health_check_config" {
     threshold    = 3
     backend_port = 80
     path         = "/"
+    matcher      = "200"
   }
 }

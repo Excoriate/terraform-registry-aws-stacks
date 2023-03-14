@@ -12,6 +12,16 @@ data "aws_security_group" "alb_sg" {
   ]
 }
 
+data "aws_security_group" "ecs_sg" {
+  for_each = !local.is_enabled ? {} : !local.is_alb_attachment_by_ecs_enabled ? {} : local.stack_config_map
+  name     = format("%s-ecs-sg", local.stack_full)
+
+  depends_on = [
+    module.ecs_security_group
+  ]
+}
+
+
 data "aws_iam_role" "execution_role" {
   for_each = !local.is_enabled ? {} : local.stack_config_map
   name     = format("%s-ecs-exec-role", trimspace(local.container_exec_role_name))
