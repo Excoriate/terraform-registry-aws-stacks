@@ -99,17 +99,19 @@ output "stack_listeners" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.57.1 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.58.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb | v1.20.0 |
-| <a name="module_alb_listeners"></a> [alb\_listeners](#module\_alb\_listeners) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener | v1.20.0 |
-| <a name="module_alb_security_group"></a> [alb\_security\_group](#module\_alb\_security\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group | v1.20.0 |
-| <a name="module_alb_target_group"></a> [alb\_target\_group](#module\_alb\_target\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group | v1.20.0 |
-| <a name="module_network_data"></a> [network\_data](#module\_network\_data) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data | v1.20.0 |
+| <a name="module_alb"></a> [alb](#module\_alb) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb | v1.29.0 |
+| <a name="module_alb_listener_rule_always_redirect_to_https"></a> [alb\_listener\_rule\_always\_redirect\_to\_https](#module\_alb\_listener\_rule\_always\_redirect\_to\_https) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener-rule | v1.29.0 |
+| <a name="module_alb_listeners"></a> [alb\_listeners](#module\_alb\_listeners) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener | v1.29.0 |
+| <a name="module_alb_security_group"></a> [alb\_security\_group](#module\_alb\_security\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group | v1.29.0 |
+| <a name="module_alb_target_group"></a> [alb\_target\_group](#module\_alb\_target\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group | v1.29.0 |
+| <a name="module_dns_records"></a> [dns\_records](#module\_dns\_records) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-dns-records | v1.29.0 |
+| <a name="module_network_data"></a> [network\_data](#module\_network\_data) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data | v1.29.0 |
 
 ## Resources
 
@@ -118,6 +120,7 @@ output "stack_listeners" {
 | [aws_alb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/alb) | data source |
 | [aws_alb_target_group.tg_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/alb_target_group) | data source |
 | [aws_alb_target_group.tg_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/alb_target_group) | data source |
+| [aws_lb_listener.http_listener](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/lb_listener) | data source |
 
 ## Requirements
 
@@ -133,8 +136,8 @@ output "stack_listeners" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_alb_targets_warmup_time"></a> [alb\_targets\_warmup\_time](#input\_alb\_targets\_warmup\_time) | The amount of time, in seconds, to wait before the first health check after the ALB is created. This<br>options maps to the target\_group configuration attribute 'slow\_start'<br>For more information, please refer to the following link: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group#slow_start | `number` | `30` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region to deploy the resources | `string` | n/a | yes |
-| <a name="input_health_check_config"></a> [health\_check\_config](#input\_health\_check\_config) | Configuration for the health check. Current allowed attributes are:<br>  - timeout: The amount of time, in seconds, during which no response means a failed health check. Default is 5.<br>  - interval: The approximate amount of time, in seconds, between health checks of an individual target. Default is 30.<br>  - threshold: The number of consecutive health check failures required before considering a target unhealthy. Default is 5.<br>  Each of these attributes maps to the target\_group configuration attribute 'health\_check'.<br>  - backend\_port: The port to use for the health check. Default is 8080. | <pre>object({<br>    timeout      = optional(number, 5)<br>    interval     = optional(number, 30)<br>    threshold    = optional(number, 5)<br>    backend_port = number<br>  })</pre> | <pre>{<br>  "backend_port": 8080,<br>  "interval": 30,<br>  "threshold": 3,<br>  "timeout": 3<br>}</pre> | no |
-| <a name="input_http_config"></a> [http\_config](#input\_http\_config) | Configuration for HTTP and HTTPS. Current allowed attributes are:<br>  - enable\_http: Whether to enable HTTP or not. Default is true.<br>  - enable\_https: Whether to enable HTTPS or not. Default is false.<br>  - domain: Domain name to use for HTTPS. Default is empty string. | <pre>object({<br>    enable_http  = optional(bool, true)<br>    enable_https = optional(bool, false)<br>    domain       = string<br>  })</pre> | n/a | yes |
+| <a name="input_health_check_config"></a> [health\_check\_config](#input\_health\_check\_config) | Configuration for the health check. Current allowed attributes are:<br>  - timeout: The amount of time, in seconds, during which no response means a failed health check. Default is 5.<br>  - interval: The approximate amount of time, in seconds, between health checks of an individual target. Default is 30.<br>  - threshold: The number of consecutive health check failures required before considering a target unhealthy. Default is 5.<br>  Each of these attributes maps to the target\_group configuration attribute 'health\_check'.<br>  - backend\_port: The port to use for the health check. Default is 8080. | <pre>object({<br>    timeout      = optional(number, 5)<br>    interval     = optional(number, 30)<br>    threshold    = optional(number, 5)<br>    backend_port = number<br>    path         = optional(string, "/")<br>    matcher      = optional(string, "200")<br>  })</pre> | <pre>{<br>  "backend_port": 80,<br>  "interval": 30,<br>  "matcher": "200",<br>  "path": "/",<br>  "threshold": 3,<br>  "timeout": 3<br>}</pre> | no |
+| <a name="input_http_config"></a> [http\_config](#input\_http\_config) | Configuration for HTTP and HTTPS. Current allowed attributes are:<br>  - enable\_http: Whether to enable HTTP or not. Default is true.<br>  - enable\_https: Whether to enable HTTPS or not. Default is false.<br>  - enable\_www: Whether to enable www. subdomain or not. Default is false.<br>  - enable\_forced\_redirection\_to\_https: Whether to enable forced redirection to HTTPS or not. Default is false.<br>  - domain: Domain name to use for HTTPS. Default is empty string.<br>  - dns\_record: DNS record to use for HTTPS. Default is empty string.<br>  - backend\_port: The port to use for the health check. Default is 8080. | <pre>object({<br>    enable_http                        = optional(bool, true)<br>    enable_https                       = optional(bool, false)<br>    enable_www                         = optional(bool, false)<br>    enable_forced_redirection_to_https = optional(bool, false)<br>    domain                             = string<br>    dns_record                         = optional(string, null)<br>    backend_port                       = optional(number, 80)<br>  })</pre> | n/a | yes |
 | <a name="input_is_enabled"></a> [is\_enabled](#input\_is\_enabled) | Whether this module will be created or not. It is useful, for stack-composite<br>modules that conditionally includes resources provided by this module.. | `bool` | n/a | yes |
 | <a name="input_is_internet_facing"></a> [is\_internet\_facing](#input\_is\_internet\_facing) | Whether the ALB is internet facing or not. | `bool` | `true` | no |
 | <a name="input_stack"></a> [stack](#input\_stack) | Name of the stack. | `string` | n/a | yes |

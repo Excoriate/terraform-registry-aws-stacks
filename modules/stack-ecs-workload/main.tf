@@ -30,9 +30,8 @@ module "network_data" {
 }
 
 locals {
-  alb_data    = !local.is_enabled ? null : data.aws_alb.this
-  alb_sg_id   = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.id])
-  alb_sg_name = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.name])
+  alb_data  = !local.is_enabled ? null : data.aws_alb.this
+  alb_sg_id = !local.is_enabled ? null : join("", [for sg in data.aws_security_group.alb_sg : sg.id])
 }
 
 // ***************************************
@@ -286,11 +285,6 @@ resource "aws_security_group_rule" "outbound_traffic_to_ecs_from_alb" {
 // ***************************************
 // 10. ECS auto-scaling
 // ***************************************
-locals {
-  auto_scaling_resource_id = format("%s/%s", local.cluster_name_normalised, local.ecs_service_name_normalised)
-  auto_scaling_type        = "ecs"
-}
-
 module "ecs_auto_scaling" {
   for_each = local.stack_config_map
   source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/auto-scaling/app-auto-scaling?ref=v0.14.0"

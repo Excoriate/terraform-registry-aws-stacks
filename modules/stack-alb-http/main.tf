@@ -20,7 +20,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.22.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -47,7 +47,7 @@ module "network_data" {
 // ***************************************
 module "alb_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.22.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -80,7 +80,7 @@ module "alb_security_group" {
 // ***************************************
 module "alb" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.22.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -128,7 +128,7 @@ locals {
 module "alb_target_group" {
   for_each = local.stack_config_map
   #    source     = "../../../terraform-registry-aws-networking/modules/target-group"
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.22.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -178,7 +178,7 @@ locals {
 
 module "alb_listeners" {
   for_each   = !local.is_http_enabled && !local.is_https_enabled ? {} : local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.22.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -215,20 +215,60 @@ locals {
 }
 
 module "dns_records" {
-  for_each   = !local.is_dns_record_generation_enabled ? {} : local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-dns-records?ref=v1.25.0"
+  for_each = !local.is_dns_record_generation_enabled ? {} : local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-dns-records?ref=v1.29.0"
+  #  source   = "../../../terraform-registry-aws-networking/modules/route53-dns-records"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
   record_type_alias_config = [
     {
-      name            = var.http_config.dns_record
-      zone_id         = local.zone_id
-      allow_overwrite = true
+      name             = var.http_config.dns_record
+      zone_id          = local.zone_id
+      enable_www_cname = var.http_config.enable_www
+      allow_overwrite  = true
       alias_target_config = {
         target_zone_id             = local.alb_zone_id
         target_dns_name            = local.alb_dns_name
         target_enable_health_check = true
+      }
+    }
+  ]
+
+  tags = local.tags
+
+  depends_on = [
+    data.aws_alb_target_group.tg_http,
+    data.aws_alb_target_group.tg_https,
+    data.aws_alb.this
+  ]
+}
+
+// ***************************************
+// 7. ALB listener rules
+// ***************************************
+locals {
+  alb_http_listener_arn  = !local.is_https_redirection_enabled ? null : join("", [for listener in data.aws_lb_listener.http_listener : listener.arn])
+  host_url_with_cname    = !local.is_https_redirection_enabled ? null : format("www.%s.%s", var.http_config.dns_record, var.http_config.domain)
+  host_url_without_cname = !local.is_https_redirection_enabled ? null : format("%s.%s", var.http_config.dns_record, var.http_config.domain)
+  #  host_url_with_explicit_http = !local.is_https_redirection_enabled ? null : format("http://%s.%s", var.http_config.dns_record, var.http_config.domain)
+}
+
+module "alb_listener_rule_always_redirect_to_https" {
+  for_each   = !local.is_https_redirection_enabled ? {} : local.stack_config_map
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb-listener-rule?ref=v1.29.0"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  action_redirect_https = [
+    {
+      name                          = local.stack
+      listener_arn                  = local.alb_http_listener_arn
+      http_request_method_condition = ["GET", "HEAD"]
+      host_header_condition         = [local.host_url_with_cname, local.host_url_without_cname]
+      http_header_condition = {
+        header = "X-Forwarded-Proto"
+        values = ["http"]
       }
     }
   ]

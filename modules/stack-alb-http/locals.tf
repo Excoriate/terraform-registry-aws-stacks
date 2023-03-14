@@ -8,6 +8,7 @@ locals {
   is_http_enabled                  = !local.is_enabled ? false : var.http_config.enable_http
   is_https_enabled                 = !local.is_enabled ? false : var.http_config.enable_https
   is_dns_record_generation_enabled = !local.is_enabled ? false : var.http_config.dns_record == null ? false : var.http_config.dns_record != ""
+  is_https_redirection_enabled     = !local.is_enabled ? false : var.http_config.enable_forced_redirection_to_https
 
   tags = local.is_enabled ? merge(
     {

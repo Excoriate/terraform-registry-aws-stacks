@@ -38,16 +38,20 @@ EOF
 
 variable "http_config" {
   type = object({
-    enable_http  = optional(bool, true)
-    enable_https = optional(bool, false)
-    domain       = string
-    dns_record   = optional(string, null)
-    backend_port = optional(number, 80)
+    enable_http                        = optional(bool, true)
+    enable_https                       = optional(bool, false)
+    enable_www                         = optional(bool, false)
+    enable_forced_redirection_to_https = optional(bool, false)
+    domain                             = string
+    dns_record                         = optional(string, null)
+    backend_port                       = optional(number, 80)
   })
   description = <<EOF
   Configuration for HTTP and HTTPS. Current allowed attributes are:
   - enable_http: Whether to enable HTTP or not. Default is true.
   - enable_https: Whether to enable HTTPS or not. Default is false.
+  - enable_www: Whether to enable www. subdomain or not. Default is false.
+  - enable_forced_redirection_to_https: Whether to enable forced redirection to HTTPS or not. Default is false.
   - domain: Domain name to use for HTTPS. Default is empty string.
   - dns_record: DNS record to use for HTTPS. Default is empty string.
   - backend_port: The port to use for the health check. Default is 8080.

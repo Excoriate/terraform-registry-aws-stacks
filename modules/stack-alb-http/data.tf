@@ -24,3 +24,9 @@ data "aws_alb" "this" {
     module.alb
   ]
 }
+
+data "aws_lb_listener" "http_listener" {
+  for_each          = !local.is_http_enabled ? {} : !local.is_https_redirection_enabled ? {} : { enabled = true }
+  load_balancer_arn = data.aws_alb.this[each.key].arn
+  port              = 80
+}

@@ -7,8 +7,10 @@ stack    = "test"
 
 // HTTP configuration
 http_config = {
-  enable_http  = true
-  enable_https = true
-  domain       = "sandbox.4id.network"
-  dns_record   = "test-app"
+  enable_http                        = true
+  enable_https                       = true
+  domain                             = "sandbox.4id.network"
+  dns_record                         = "test-app"
+  enable_www                         = true
+  enable_forced_redirection_to_https = true
 }
