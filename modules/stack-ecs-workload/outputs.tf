@@ -67,3 +67,8 @@ output "stack_ecs_alb_attachment" {
   }
   description = "The stack ECS ALB attachment."
 }
+
+output "stack_auto_scaling" {
+  value       = module.ecs_auto_scaling
+  description = "The stack auto scaling."
+}

@@ -4,9 +4,10 @@ locals {
   /*
    * Feature flags
   */
-  is_enabled       = var.is_enabled
-  is_http_enabled  = !local.is_enabled ? false : var.http_config.enable_http
-  is_https_enabled = !local.is_enabled ? false : var.http_config.enable_https
+  is_enabled                       = var.is_enabled
+  is_http_enabled                  = !local.is_enabled ? false : var.http_config.enable_http
+  is_https_enabled                 = !local.is_enabled ? false : var.http_config.enable_https
+  is_dns_record_generation_enabled = !local.is_enabled ? false : var.http_config.dns_record == null ? false : var.http_config.dns_record != ""
 
   tags = local.is_enabled ? merge(
     {

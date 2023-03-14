@@ -136,7 +136,7 @@ module "alb_target_group" {
     // 4.1. Create a target group for the ALB for HTTP traffic.
     !local.is_enabled ? null : !local.is_http_enabled ? null : merge({
       name     = format("%s-alb-tg-http", local.stack_full)
-      port     = 80
+      port     = var.http_config.backend_port
       protocol = "HTTP"
       health_check = merge({
         protocol = "HTTP"
@@ -145,10 +145,10 @@ module "alb_target_group" {
     // 4.2. Create a target group for the ALB for HTTPS traffic.
     !local.is_enabled ? null : !local.is_https_enabled ? null : merge({
       name     = format("%s-alb-tg-https", local.stack_full)
-      port     = 443
-      protocol = "HTTPS"
+      port     = var.http_config.backend_port
+      protocol = "HTTP"
       health_check = merge({
-        protocol = "HTTPS"
+        protocol = "HTTP"
       }, local.target_group_health_check_defaults)
     }, local.target_group_defaults)
   ]
@@ -195,6 +195,42 @@ module "alb_listeners" {
       certificate_arn  = local.certificate_arn
       target_group_arn = local.target_group_https_arn
     }, local.listener_defaults)
+  ]
+
+  tags = local.tags
+
+  depends_on = [
+    data.aws_alb_target_group.tg_http,
+    data.aws_alb_target_group.tg_https,
+    data.aws_alb.this
+  ]
+}
+
+// ***************************************
+// 6. Optional DNS records
+// ***************************************
+locals {
+  alb_zone_id  = !local.is_dns_record_generation_enabled ? null : join("", [for alb in data.aws_alb.this : alb.zone_id])
+  alb_dns_name = !local.is_dns_record_generation_enabled ? null : join("", [for alb in data.aws_alb.this : alb.dns_name])
+}
+
+module "dns_records" {
+  for_each   = !local.is_dns_record_generation_enabled ? {} : local.stack_config_map
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/route53-dns-records?ref=v1.25.0"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  record_type_alias_config = [
+    {
+      name            = var.http_config.dns_record
+      zone_id         = local.zone_id
+      allow_overwrite = true
+      alias_target_config = {
+        target_zone_id             = local.alb_zone_id
+        target_dns_name            = local.alb_dns_name
+        target_enable_health_check = true
+      }
+    }
   ]
 
   tags = local.tags

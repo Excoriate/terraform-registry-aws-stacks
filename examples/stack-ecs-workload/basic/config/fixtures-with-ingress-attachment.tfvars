@@ -26,4 +26,4 @@ container_config = {
 }
 
 scaling_up_max_capacity                 = 2
-attach_ingress_alb_target_group_by_name = ["stack-test-alb-tg-http"]
+attach_ingress_alb_target_group_by_name = ["stack-test-alb-tg-http", "stack-test-alb-tg-https"]

@@ -41,12 +41,16 @@ variable "http_config" {
     enable_http  = optional(bool, true)
     enable_https = optional(bool, false)
     domain       = string
+    dns_record   = optional(string, null)
+    backend_port = optional(number, 80)
   })
   description = <<EOF
   Configuration for HTTP and HTTPS. Current allowed attributes are:
   - enable_http: Whether to enable HTTP or not. Default is true.
   - enable_https: Whether to enable HTTPS or not. Default is false.
   - domain: Domain name to use for HTTPS. Default is empty string.
+  - dns_record: DNS record to use for HTTPS. Default is empty string.
+  - backend_port: The port to use for the health check. Default is 8080.
   EOF
 }
 
