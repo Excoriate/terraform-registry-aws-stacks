@@ -15,7 +15,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.23.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -39,7 +39,7 @@ locals {
 // ***************************************
 module "ecs_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.23.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
