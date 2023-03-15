@@ -29,4 +29,11 @@ data "aws_lb_listener" "http_listener" {
   for_each          = !local.is_http_enabled ? {} : !local.is_https_redirection_enabled ? {} : { enabled = true }
   load_balancer_arn = data.aws_alb.this[each.key].arn
   port              = 80
+
+  depends_on = [
+    module.alb_listeners,
+    module.alb_target_group,
+    module.alb,
+    module.alb_listener_rule_always_redirect_to_https
+  ]
 }
