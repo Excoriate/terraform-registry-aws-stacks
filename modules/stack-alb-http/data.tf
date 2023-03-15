@@ -32,8 +32,6 @@ data "aws_lb_listener" "http_listener" {
 
   depends_on = [
     module.alb_listeners,
-    module.alb_target_group,
-    module.alb,
     module.alb_listener_rule_always_redirect_to_https
   ]
 }
