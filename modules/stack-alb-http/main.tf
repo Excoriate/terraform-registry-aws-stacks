@@ -148,9 +148,9 @@ locals {
     }, local.target_group_health_check_defaults)
   }, local.target_group_defaults)
 
-  target_group_config = compact([
-    local.tg_config_https != null ? local.tg_config_https : null,
-    local.tg_config_http != null ? local.tg_config_http : null
+  target_group_config = flatten([
+    local.tg_config_https,
+    local.tg_config_http
   ])
 }
 module "alb_target_group" {
