@@ -4,11 +4,12 @@ locals {
   /*
    * Feature flags
   */
-  is_enabled                       = var.is_enabled
-  is_http_enabled                  = !local.is_enabled ? false : var.http_config.enable_http
-  is_https_enabled                 = !local.is_enabled ? false : var.http_config.enable_https
-  is_dns_record_generation_enabled = !local.is_enabled ? false : var.http_config.dns_record == null ? false : var.http_config.dns_record != ""
-  is_https_redirection_enabled     = !local.is_enabled ? false : var.http_config.enable_forced_redirection_to_https
+  is_enabled                            = var.is_enabled
+  is_http_enabled                       = !local.is_enabled ? false : var.http_config.enable_http
+  is_https_enabled                      = !local.is_enabled ? false : var.http_config.enable_https
+  is_dns_record_generation_enabled      = !local.is_enabled ? false : var.http_config.dns_record == null ? false : var.http_config.dns_record != ""
+  is_https_redirection_enabled          = !local.is_enabled ? false : var.http_config.enable_forced_redirection_to_https
+  is_fronting_a_backend_service_enabled = !local.is_enabled ? false : var.http_config.is_backend_service
 
   tags = local.is_enabled ? merge(
     {

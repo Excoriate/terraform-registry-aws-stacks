@@ -45,6 +45,7 @@ variable "http_config" {
     domain                             = string
     dns_record                         = optional(string, null)
     backend_port                       = optional(number, 80)
+    is_backend_service                 = optional(bool, false)
   })
   description = <<EOF
   Configuration for HTTP and HTTPS. Current allowed attributes are:
@@ -55,8 +56,10 @@ variable "http_config" {
   - domain: Domain name to use for HTTPS. Default is empty string.
   - dns_record: DNS record to use for HTTPS. Default is empty string.
   - backend_port: The port to use for the health check. Default is 8080.
+  - is_backend_service: Whether the backend is a service or not. Default is false. If it's a backend service, it'll set the ALB listeners to the 'backend_port' defined
   EOF
 }
+
 
 variable "alb_targets_warmup_time" {
   type        = number

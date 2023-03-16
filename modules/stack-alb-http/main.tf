@@ -20,7 +20,7 @@ locals {
 // ***************************************
 module "network_data" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.29.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data?ref=v1.30.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -47,7 +47,7 @@ module "network_data" {
 // ***************************************
 module "alb_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.29.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.30.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -61,10 +61,12 @@ module "alb_security_group" {
 
   security_group_rules_ooo = [
     {
-      sg_parent                         = format("%s-alb-sg", local.stack_full)
-      enable_inbound_http               = local.is_http_enabled
-      enable_inbound_https              = local.is_https_enabled
-      enable_inbound_icmp_from_anywhere = true
+      sg_parent                            = format("%s-alb-sg", local.stack_full)
+      enable_inbound_http                  = local.is_fronting_a_backend_service_enabled ? false : true
+      enable_inbound_https                 = local.is_fronting_a_backend_service_enabled ? false : true
+      enable_inbound_icmp_from_anywhere    = true
+      custom_port                          = local.is_fronting_a_backend_service_enabled ? var.http_config.backend_port : null
+      enable_inbound_from_custom_port_cidr = local.is_fronting_a_backend_service_enabled
     }
   ]
 
@@ -80,7 +82,7 @@ module "alb_security_group" {
 // ***************************************
 module "alb" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.29.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.30.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
