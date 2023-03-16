@@ -39,7 +39,7 @@ locals {
 // ***************************************
 module "ecs_security_group" {
   for_each   = local.stack_config_map
-  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.29.0"
+  source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group?ref=v1.30.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
@@ -53,13 +53,15 @@ module "ecs_security_group" {
 
   security_group_rules_ooo = [
     {
-      sg_parent                        = format("%s-ecs-sg", local.stack_full)
-      enable_all_outbound_traffic      = true
-      enable_inbound_https_from_source = local.is_https_enabled
-      enable_inbound_http_from_source  = local.is_http_enabled
-      source_security_group_id         = local.alb_sg_id
-      enable_outbound_https            = true
-      enable_outbound_http             = true
+      sg_parent                              = format("%s-ecs-sg", local.stack_full)
+      enable_all_outbound_traffic            = true
+      enable_inbound_https_from_source       = local.is_https_enabled
+      enable_inbound_http_from_source        = local.is_http_enabled
+      source_security_group_id               = local.alb_sg_id
+      enable_outbound_https                  = true
+      enable_outbound_http                   = true
+      custom_port                            = var.port_config.container_port
+      enable_inbound_from_custom_port_source = true
     }
   ]
 

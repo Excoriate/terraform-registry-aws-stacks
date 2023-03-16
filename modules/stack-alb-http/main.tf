@@ -160,7 +160,7 @@ module "alb_target_group" {
   is_enabled = var.is_enabled
 
   target_group_config = [
-    for tg in local.target_group_config : tg if tg != null]
+  for tg in local.target_group_config : tg if tg != null]
   depends_on = [
     module.network_data
   ]
