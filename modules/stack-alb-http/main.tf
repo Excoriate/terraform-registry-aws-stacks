@@ -127,34 +127,39 @@ locals {
   }
 }
 
+locals {
+  // HTTP(s) specific target group
+  tg_config_https = !local.is_enabled ? null : !local.is_https_enabled ? null : merge({
+    name     = format("%s-alb-tg-https", local.stack_full)
+    port     = var.http_config.backend_port
+    protocol = "HTTP"
+    health_check = merge({
+      protocol = "HTTP"
+    }, local.target_group_health_check_defaults)
+  }, local.target_group_defaults)
+
+  // HTTP specific target group
+  tg_config_http = !local.is_enabled ? null : !local.is_http_enabled ? null : merge({
+    name     = format("%s-alb-tg-http", local.stack_full)
+    port     = var.http_config.backend_port
+    protocol = "HTTP"
+    health_check = merge({
+      protocol = "HTTP"
+    }, local.target_group_health_check_defaults)
+  }, local.target_group_defaults)
+
+  target_group_config = compact([
+    local.tg_config_https != null ? local.tg_config_https : null,
+    local.tg_config_http != null ? local.tg_config_http : null
+  ])
+}
 module "alb_target_group" {
-  for_each = local.stack_config_map
-  #    source     = "../../../terraform-registry-aws-networking/modules/target-group"
+  for_each   = local.stack_config_map
   source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/target-group?ref=v1.29.0"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
-  target_group_config = [
-    // 4.1. Create a target group for the ALB for HTTP traffic.
-    !local.is_enabled ? null : !local.is_http_enabled ? null : merge({
-      name     = format("%s-alb-tg-http", local.stack_full)
-      port     = var.http_config.backend_port
-      protocol = "HTTP"
-      health_check = merge({
-        protocol = "HTTP"
-      }, local.target_group_health_check_defaults)
-    }, local.target_group_defaults),
-    // 4.2. Create a target group for the ALB for HTTPS traffic.
-    !local.is_enabled ? null : !local.is_https_enabled ? null : merge({
-      name     = format("%s-alb-tg-https", local.stack_full)
-      port     = var.http_config.backend_port
-      protocol = "HTTP"
-      health_check = merge({
-        protocol = "HTTP"
-      }, local.target_group_health_check_defaults)
-    }, local.target_group_defaults)
-  ]
-
+  target_group_config = local.target_group_config
   depends_on = [
     module.network_data
   ]
