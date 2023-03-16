@@ -148,10 +148,10 @@ locals {
     }, local.target_group_health_check_defaults)
   }, local.target_group_defaults)
 
-  target_group_config = flatten([
+  target_group_config = [
     local.tg_config_https,
     local.tg_config_http
-  ])
+  ]
 }
 module "alb_target_group" {
   for_each   = local.stack_config_map
@@ -159,7 +159,8 @@ module "alb_target_group" {
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
-  target_group_config = local.target_group_config
+  target_group_config = [
+    for tg in local.target_group_config : tg if tg != null]
   depends_on = [
     module.network_data
   ]
