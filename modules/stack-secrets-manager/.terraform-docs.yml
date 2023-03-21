@@ -1,0 +1,61 @@
+---
+formatter: markdown table
+
+header-from: main.tf
+content: |-
+    # ☁️ AWS Secrets manager stack
+    ## Description
+    {{ .Header }}
+    This stack module creates a secret in AWS Secrets Manager, and optionally, add IAM policies that can be attached if permissions are required.
+    * 🚀 Create a secret in AWS Secrets Manager
+    * 🚀 Create IAM policies.
+    * 🚀 Set custom permissions for the secret policies
+
+    ---
+    ## Example
+    Examples of this module's usage are available in the [examples](./examples) folder.
+
+    ```hcl
+    {{ include "../../examples/stack-secrets-manager/basic/main.tf" }}
+    ```
+    For an example that pass custom permissions to auto-generate an IAM policy, see:
+    ```hcl
+    {{ include "../../examples/stack-secrets-manager/basic/config/fixtures-with-permissions.tfvars" }}
+
+    ```
+    For an example that creates a secret with regional replication, see:
+    ```hcl
+    {{ include "../../examples/stack-secrets-manager/basic/config/fixtures-with-replication.tfvars" }}
+
+    ```
+
+    For module composition, It's recommended to take a look at the module's `outputs` to understand what's available:
+    ```hcl
+    {{ include "outputs.tf" }}
+    ```
+    ---
+
+    ## Module's documentation
+    (This documentation is auto-generated using [terraform-docs](https://terraform-docs.io))
+    {{ .Providers }}
+
+    {{ .Modules }}
+
+    {{ .Resources }}
+
+    {{ .Requirements }}
+
+    {{ .Inputs }}
+
+    {{ .Outputs }}
+
+output:
+    file: README.md
+    mode: inject
+    template: |-
+        <!-- BEGIN_TF_DOCS -->
+        {{ .Content }}
+        <!-- END_TF_DOCS -->
+settings:
+    anchor: true
+    color: true

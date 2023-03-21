@@ -48,6 +48,7 @@ The documentation is **automatically generated** by [terraform-docs](https://ter
 |------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `aws-dns-zone-multi-account` | Stable ✅ | A stack-composite module that implements a multi-account DNS zone delegation.                                                                             |
 | `aws-alb-http`               | Stable ✅ | Stack-composite module that implement a common ALB/Ingress architecture, for fronting a backend such as an ECS-based (micro?) service, API or equivalent. |
+| `aws-secrets-manager`        | Stable ✅ | Stack-composite that implement a common set of actions on top of an AWS secret, including replication, permissions, etc..                                 |
 
 ### Getting Started
 
