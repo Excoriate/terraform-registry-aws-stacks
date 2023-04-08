@@ -116,11 +116,11 @@ output "stack_auto_scaling" {
 | <a name="module_ecs_container_definition"></a> [ecs\_container\_definition](#module\_ecs\_container\_definition) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition | v0.14.0 |
 | <a name="module_ecs_execution_role"></a> [ecs\_execution\_role](#module\_ecs\_execution\_role) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles | v0.14.0 |
 | <a name="module_ecs_log_group"></a> [ecs\_log\_group](#module\_ecs\_log\_group) | git::github.com/Excoriate/terraform-registry-observability//modules/aws/cloudwatch-log-group | v0.1.0 |
-| <a name="module_ecs_security_group"></a> [ecs\_security\_group](#module\_ecs\_security\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group | v1.23.0 |
-| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-service | v0.14.0 |
-| <a name="module_ecs_task_definition"></a> [ecs\_task\_definition](#module\_ecs\_task\_definition) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task | v0.14.0 |
+| <a name="module_ecs_security_group"></a> [ecs\_security\_group](#module\_ecs\_security\_group) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/security-group | v1.30.0 |
+| <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-service | v0.16.0 |
+| <a name="module_ecs_task_definition"></a> [ecs\_task\_definition](#module\_ecs\_task\_definition) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task | v0.16.0 |
 | <a name="module_ecs_task_role"></a> [ecs\_task\_role](#module\_ecs\_task\_role) | git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-roles | v0.14.0 |
-| <a name="module_network_data"></a> [network\_data](#module\_network\_data) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data | v1.23.0 |
+| <a name="module_network_data"></a> [network\_data](#module\_network\_data) | git::github.com/Excoriate/terraform-registry-aws-networking//modules/lookup-data | v1.29.0 |
 
 ## Resources
 

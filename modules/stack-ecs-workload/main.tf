@@ -176,19 +176,19 @@ locals {
 
 module "ecs_task_definition" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task?ref=v0.15.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-task?ref=v0.16.0"
   #  source   = "../../../terraform-registry-aws-containers/modules/ecs-task"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
 
   task_config = [
     {
-      name                           = local.stack_full
-      family                         = format("task-def-%s", local.workload_name_normalised)
-      cpu                            = var.container_config.cpu
-      memory                         = var.container_config.memory
-      network_mode                   = "awsvpc"
-      container_definition_from_json = module.ecs_container_definition[local.stack].json_map_encoded_list
+      name                             = local.stack_full
+      family                           = format("task-def-%s", local.workload_name_normalised)
+      cpu                              = var.container_config.cpu
+      memory                           = var.container_config.memory
+      network_mode                     = "awsvpc"
+      container_definition_from_json   = module.ecs_container_definition[local.stack].json_map_encoded_list
       manage_task_outside_of_terraform = var.manage_ecs_service_out_of_terraform
     }
   ]
@@ -222,7 +222,7 @@ locals {
 
 module "ecs_service" {
   for_each = local.stack_config_map
-  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-service?ref=v0.14.0"
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-service?ref=v0.16.0"
   #  source   = "../../../terraform-registry-aws-containers/modules/ecs-service"
   aws_region = var.aws_region
   is_enabled = var.is_enabled
