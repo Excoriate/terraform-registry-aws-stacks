@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.1.0...v1.2.0) (2023-05-21)
+
+
+### Features
+
+* add support for built-in ecr container registry ([f1c02bc](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/f1c02bcb4253e93d9e019828c1a138954087e27a))
+
 ## [1.1.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.0.0...v1.1.0) (2023-05-21)
 
 
