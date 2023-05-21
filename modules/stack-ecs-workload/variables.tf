@@ -158,3 +158,16 @@ It'll be used to attach the ECS service to the ALB.
 EOF
   default     = null
 }
+
+variable "enable_built_in_container_registry_config"{
+  type        = object({
+    is_enabled = optional(bool, true)
+    repository_name = optional(string, null)
+  })
+  description = <<EOF
+  Whether to enable the built-in container registry or not. If set to true, the module
+will create automatically an Elastic Container Registry (ECR), with best-practices
+and recommended settings (E.g.: encryption, image scanning, etc).
+EOF
+  default     = null
+}

@@ -91,13 +91,39 @@ module "ecs_log_group" {
 }
 
 // ***************************************
+// 4. Elastic Container Registry
+// ***************************************
+locals {
+  is_ecr_built_in_enabled = !var.is_enabled ? false : var.enable_built_in_container_registry_config == null ? false : lookup(var.enable_built_in_container_registry_config, "is_enabled", false)
+}
+module "ecs_container_registry" {
+  for_each   = !local.is_ecr_built_in_enabled ? {} : local.stack_config_map
+  source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecr?ref=v1.1.0"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+  ecr_lifecycle_policy_config = {
+    name          = lookup(var.enable_built_in_container_registry_config, "repository_name", local.stack_full)
+    max_image_count = 500
+    protected_tags  = ["latest", "prod", "dev", "stage", "sandbox", "master", "legacy", "int"]
+  }
+  ecr_config = [{
+    name                 = lookup(var.enable_built_in_container_registry_config, "repository_name", local.stack_full)
+    scan_on_push         = true
+    force_delete         = true
+  }]
+  tags = local.tags
+}
+
+
+// ***************************************
 // 4. Container definition
 // ***************************************
 module "ecs_container_definition" {
   for_each = local.stack_config_map
   source   = "git::github.com/Excoriate/terraform-registry-aws-containers//modules/ecs-container-definition?ref=v0.17.0"
 
-  container_image  = local.container_image
+#  container_image  = local.container_image
+  container_image  = !local.is_ecr_built_in_enabled ? local.container_image : module.ecs_container_registry[local.stack].ecr_repository_url[0]
   container_name   = local.workload_name_normalised
   container_memory = var.container_config.memory
   container_cpu    = var.container_config.cpu

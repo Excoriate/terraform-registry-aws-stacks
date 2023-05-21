@@ -59,6 +59,11 @@ output "stack_ecs_task_definition" {
   description = "The stack ECS task."
 }
 
+output "stack_ecr"{
+  value       = module.ecs_container_registry
+  description = "The stack ECR."
+}
+
 output "stack_ecs_alb_attachment" {
   value = {
     tg_to_attach          = local.target_groups_to_attach
