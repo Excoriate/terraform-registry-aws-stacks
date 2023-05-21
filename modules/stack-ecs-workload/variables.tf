@@ -32,7 +32,7 @@ EOF
 variable "stack_prefix" {
   type        = string
   description = "Prefix for the stack"
-  default     = "stack"
+  default     = null
 }
 
 variable "vpc_name" {

@@ -80,6 +80,12 @@ module "alb_security_group" {
 // ***************************************
 // 3. Application load balancer
 // ***************************************
+locals {
+  alb_name = format("%s-alb", local.stack_full)
+  alb_fixed = replace(local.alb_name, "alb", "")
+  alb_no_hyphens = replace(local.alb_fixed, "-", "")
+  alb_no_hyphens_no_alb = replace(local.alb_no_hyphens, "alb", "")
+}
 module "alb" {
   for_each   = local.stack_config_map
   source     = "git::github.com/Excoriate/terraform-registry-aws-networking//modules/alb?ref=v1.30.0"
@@ -88,7 +94,7 @@ module "alb" {
 
   alb_config = [
     {
-      name                             = format("%s-alb", local.stack_full)
+      name                             = length(local.alb_name) < 32 ? local.alb_name : length(local.alb_fixed) < 32 ? local.alb_fixed : length(local.alb_no_hyphens) < 32 ? local.alb_no_hyphens : length(local.alb_no_hyphens_no_alb) < 32 ? local.alb_no_hyphens_no_alb : substr(local.alb_no_hyphens_no_alb, 0, 32)
       subnets_public                   = [local.subnet_az_a_id, local.subnet_az_b_id, local.subnet_az_c_id]
       is_internal                      = var.is_internet_facing ? false : true
       enable_http2                     = true
@@ -130,7 +136,7 @@ locals {
 locals {
   // HTTP(s) specific target group
   tg_config_https = !local.is_enabled ? null : !local.is_https_enabled ? null : merge({
-    name     = format("%s-alb-tg-https", local.stack_full)
+    name     = format("%s-https", local.stack_full)
     port     = var.http_config.backend_port
     protocol = "HTTP"
     health_check = merge({
@@ -140,7 +146,7 @@ locals {
 
   // HTTP specific target group
   tg_config_http = !local.is_enabled ? null : !local.is_http_enabled ? null : merge({
-    name     = format("%s-alb-tg-http", local.stack_full)
+    name     = format("%s-http", local.stack_full)
     port     = var.http_config.backend_port
     protocol = "HTTP"
     health_check = merge({
@@ -178,8 +184,8 @@ locals {
   }
 
   // 5.2 Handy to get the target group ARN through data sources.
-  target_group_name_http  = !local.is_http_enabled ? null : format("%s-alb-tg-http", local.stack_full)
-  target_group_name_https = !local.is_https_enabled ? null : format("%s-alb-tg-https", local.stack_full)
+  target_group_name_http  = !local.is_http_enabled ? null : format("%s-http", local.stack_full)
+  target_group_name_https = !local.is_https_enabled ? null : format("%s-https", local.stack_full)
   target_group_http_arn   = !local.is_http_enabled ? null : join("", [for tg in data.aws_alb_target_group.tg_http : tg.arn])
   target_group_https_arn  = !local.is_https_enabled ? null : join("", [for tg in data.aws_alb_target_group.tg_https : tg.arn])
 }

@@ -21,8 +21,8 @@ locals {
   stack_config = !local.is_enabled ? [] : [
     {
       name   = lower(trimspace(var.stack))
-      prefix = lower(trimspace(var.stack_prefix))
-      full   = format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
+      prefix = var.stack_prefix == null ? "" : lower(trimspace(var.stack_prefix))
+      full   = var.stack_prefix == null ? lower(trimspace(var.stack)) : format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
     }
   ]
 
@@ -37,7 +37,7 @@ locals {
   }
 
   stack      = !local.is_enabled ? null : lower(trimspace(var.stack))
-  stack_full = !local.is_enabled ? null : format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
+  stack_full = !local.is_enabled ? null : var.stack_prefix == null ? lower(trimspace(var.stack)) : format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
 
   vpc_name_normalised         = !local.is_enabled ? null : lower(trimspace(var.vpc_name))
   workload_name_normalised    = !local.is_enabled ? null : lower(trimspace(var.workload_name))

@@ -39,7 +39,7 @@ EOF
 variable "stack_prefix" {
   type        = string
   description = "Prefix for the stack"
-  default     = "stack"
+  default     = null
 }
 
 variable "is_internet_facing" {
