@@ -59,7 +59,7 @@ output "stack_ecs_task_definition" {
   description = "The stack ECS task."
 }
 
-output "stack_ecr"{
+output "stack_ecr" {
   value       = module.ecs_container_registry
   description = "The stack ECR."
 }
@@ -76,4 +76,12 @@ output "stack_ecs_alb_attachment" {
 output "stack_auto_scaling" {
   value       = module.ecs_auto_scaling
   description = "The stack auto scaling."
+}
+
+output "stack_info" {
+  value = {
+    stack      = local.stack
+    stack_full = local.stack_full
+  }
+  description = "The stack info."
 }

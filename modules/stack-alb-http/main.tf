@@ -81,9 +81,9 @@ module "alb_security_group" {
 // 3. Application load balancer
 // ***************************************
 locals {
-  alb_name = format("%s-alb", local.stack_full)
-  alb_fixed = replace(local.alb_name, "alb", "")
-  alb_no_hyphens = replace(local.alb_fixed, "-", "")
+  alb_name              = format("%s-alb", local.stack_full)
+  alb_fixed             = replace(local.alb_name, "alb", "")
+  alb_no_hyphens        = replace(local.alb_fixed, "-", "")
   alb_no_hyphens_no_alb = replace(local.alb_no_hyphens, "alb", "")
 }
 module "alb" {

@@ -37,7 +37,7 @@ locals {
   }
 
   stack      = !local.is_enabled ? null : lower(trimspace(var.stack))
-  stack_full = !local.is_enabled ? null : var.stack_prefix == null ?  lower(trimspace(var.stack)) : format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
+  stack_full = !local.is_enabled ? null : var.stack_prefix == null ? lower(trimspace(var.stack)) : format("%s-%s", lower(trimspace(var.stack_prefix)), lower(trimspace(var.stack)))
 
 
   vpc_name_normalised = !local.is_enabled ? null : lower(trimspace(var.vpc_name))

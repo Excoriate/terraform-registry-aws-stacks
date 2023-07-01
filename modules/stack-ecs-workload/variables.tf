@@ -159,9 +159,9 @@ EOF
   default     = null
 }
 
-variable "enable_built_in_container_registry_config"{
-  type        = object({
-    is_enabled = optional(bool, true)
+variable "enable_built_in_container_registry_config" {
+  type = object({
+    is_enabled      = optional(bool, true)
     repository_name = optional(string, null)
   })
   description = <<EOF
