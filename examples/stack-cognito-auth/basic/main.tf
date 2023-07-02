@@ -29,4 +29,7 @@ module "main_module" {
   schema_attributes_config                                   = var.schema_attributes_config
   verification_message_template_config                       = var.verification_message_template_config
   lambda_config                                              = var.lambda_config
+
+  // Identity provider.
+  identity_provider_config = var.identity_provider_config
 }

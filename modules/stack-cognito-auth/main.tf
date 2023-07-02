@@ -153,3 +153,25 @@ module "auth_cognito_user_pool" {
     data.aws_ses_domain_identity.this
   ]
 }
+
+// ***************************************
+// 3. Identity provider
+// ***************************************
+module "auth_cognito_identity_provider" {
+  for_each   = !local.is_identity_provider_config_enabled ? {} : local.stack_create
+  source     = "git::github.com/Excoriate/terraform-registry-aws-events//modules/cognito/identity-provider?ref=v0.1.17"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  identity_provider_config = [for idp in var.identity_provider_config : {
+    name             = format("%s-%s", each.value, idp.idp_name)
+    user_pool_id     = join("", [for user_pool in data.aws_cognito_user_pools.this : user_pool.ids[0]])
+    provider_name    = idp.provider_name
+    provider_type    = idp.provider_type
+    provider_details = idp.provider_details
+  }]
+
+  identity_provider_optionals_config = length(local.identity_provider_optionals_config_create) == 0 ? null : local.identity_provider_optionals_config_create
+
+  tags = local.tags
+}
