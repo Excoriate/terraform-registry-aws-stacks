@@ -9,7 +9,7 @@ data "aws_ses_domain_identity" "this" {
 
 data "aws_cognito_user_pools" "this" {
   for_each = !local.is_identity_provider_config_enabled ? {} : local.stack_create
-  name     = each.value
+  name     = local.user_pool_name
 
   depends_on = [
     module.auth_cognito_user_pool

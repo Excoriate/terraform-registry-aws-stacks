@@ -114,8 +114,8 @@ EOF
 
 variable "user_pool_mfa_configuration_config" {
   type = object({
-    enable_mfa               = optional(bool, false)
-    disable_mfa              = optional(bool, true) // set by default
+    enable_mfa               = optional(bool, true)
+    disable_mfa              = optional(bool, false) // set by default
     enable_optional_mfa      = optional(bool, false)
     allow_software_mfa_token = optional(bool, false)
   })
@@ -159,7 +159,16 @@ variable "user_pool_account_recovery_config" {
   List of account recovery configurations to create. These attributes are used in order
 to set the account recovery message that is sent to the user when they sign up.
 EOF
-  default     = null
+  default = [
+    {
+      name     = "verified_email"
+      priority = 1
+    },
+    {
+      name     = "verified_phone_number"
+      priority = 2
+    },
+  ]
 }
 
 variable "user_pool_device_only_remembered_on_user_prompt" {
@@ -341,6 +350,52 @@ These are:
   - provider_details: The identity provider details, such as MetadataURL and MetadataFile.
   - attribute_mapping: A mapping of identity provider attributes to standard and custom user pool attributes.
   - idp_identifiers: A list of identity provider identifiers.
+EOF
+  default     = null
+}
+
+variable "user_pool_clients_config" {
+  type = list(object({
+    client_name                          = string
+    allowed_oauth_flows_user_pool_client = optional(bool, true)                         // Indicates whether the client is allowed to follow the OAuth protocol when interacting with Cognito user pools.
+    allowed_oauth_flows                  = optional(list(string), ["code", "implicit"]) // Grant types ["code", "implicit", "client_credentials"] allowed with this user pool client.
+    allowed_oauth_scopes = optional(list(string), [
+      "phone", "email", "openid", "profile", "aws.cognito.signin.user.admin"
+    ])
+    // The type of Amazon Cognito resources that can be accessed with the OAuth scopes provided.
+    callback_urls           = list(string)           // List of allowed redirect (signin) URLs for the Identity providers.
+    id_token_validity       = optional(number, 1)    // The time limit in days after which an ID token is no longer valid and with which a user must log back into your client app, the default is 30 days.
+    access_token_validity   = optional(number, 1)    // The time limit in days after which an access token is no longer valid and with which a user must be asked to log back into your client app, the default is 60 days.
+    refresh_token_validity  = optional(number, null) // The time limit in days after which a refresh token is no longer valid and with which a user must log back into your client app, the default is 30 days.
+    enable_token_revocation = optional(bool, false)  // Whether to revoke userpool application client tokens upon token expiration.
+    token_validity_units = optional(object({
+      id_token      = optional(string, "days")
+      access_token  = optional(string, "days")
+      refresh_token = optional(string, null)
+    }), null)
+    auth_session_validity         = optional(number, null) // The time limit in days for the refresh token within an AWS AppStream streaming URL, the default is 1 day.
+    default_redirect_uri          = string                 // The default URL where we redirect the user after they sign in.
+    explicit_auth_flows           = optional(list(string), ["ADMIN_NO_SRP_AUTH", "CUSTOM_AUTH_FLOW_ONLY", "USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"])
+    generate_secret               = optional(bool, false)                                            // Should the app client secret be generated? As a security measure, this should be set to true for web application type clients.
+    logout_urls                   = list(string)                                                     // List of allowed logout URLs for the Identity providers.
+    read_attributes               = optional(list(string), null)                                     // List of read attributes for the user pool.
+    supported_identity_providers  = optional(list(string), ["COGNITO", "Google", "SignInWithApple"]) // List of provider types for the Identity providers to connect with.
+    prevent_user_existence_errors = optional(string, "ENABLED")                                      // Choose settings that can help prevent your app from revealing information about your users' accounts.
+    write_attributes              = optional(list(string), null)                                     // List of write attributes for the user pool.
+  }))
+  description = <<EOF
+  List of user pool client configurations to create. The required arguments are described in the AWS provider documentation:
+  https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cognito_user_pool_client
+
+   These are:
+     - name: Friendly identifier for the Terraform resource to be created.
+     - user_pool_id: The user pool ID.
+     - client_name: Client friendly name.
+     - callback_urls: List of URLs for the callback signing in.
+     - default_redirect_uri: Must be listed in the CallbackURLs.
+     - logout_urls: List of URLs for signing out.
+
+   Note: To enhance security measures, avoid passing sensitive data as inline text or hardcoding. Instead, consider using environment variables or encrypted data using key management services.
 EOF
   default     = null
 }

@@ -32,4 +32,7 @@ module "main_module" {
 
   // Identity provider.
   identity_provider_config = var.identity_provider_config
+
+  // Cognito user pool client
+  user_pool_clients_config = var.user_pool_clients_config
 }
