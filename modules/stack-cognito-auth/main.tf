@@ -210,3 +210,22 @@ module "auth_cognito_user_pool_clients" {
     module.auth_cognito_identity_provider
   ]
 }
+
+// ***************************************
+// 5. Cognito domain
+// ***************************************
+module "auth_cognito_user_pool_domain" {
+  for_each   = !local.is_user_pool_domain_config_enabled ? {} : local.stack_create
+  source     = "git::github.com/Excoriate/terraform-registry-aws-events//modules/cognito/user-pool-domain?ref=v0.1.17"
+  aws_region = var.aws_region
+  is_enabled = var.is_enabled
+
+  user_pool_domain_config = [
+    merge({
+      name         = local.id
+      user_pool_id = join("", [for user_pool in data.aws_cognito_user_pools.this : user_pool.ids[0]])
+    }, { for k, v in var.user_pool_domain_config : k => v == null ? null : v == "" ? null : v })
+  ]
+
+  tags = local.tags
+}

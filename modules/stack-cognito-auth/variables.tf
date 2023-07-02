@@ -399,3 +399,16 @@ variable "user_pool_clients_config" {
 EOF
   default     = null
 }
+
+variable "user_pool_domain_config" {
+  type = object({
+    certificate_arn = optional(string, null)
+    domain          = string
+  })
+  description = <<EOF
+  The ARN of an ISSUED ACM certificate in us-east-1 for a custom domain name.
+  Required if you specify a custom domain name for your user pool.
+  Otherwise, this property can be omitted.
+EOF
+  default     = null
+}

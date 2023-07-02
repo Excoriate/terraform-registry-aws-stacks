@@ -29,10 +29,12 @@ module "main_module" {
   user_pool_schema_attributes_config                         = var.user_pool_schema_attributes_config
   user_pool_verification_message_template_config             = var.user_pool_verification_message_template_config
   user_pool_lambda_config                                    = var.user_pool_lambda_config
+  user_pool_domain_config                                    = var.user_pool_domain_config
 
   // Identity provider.
   identity_provider_config = var.identity_provider_config
 
   // Cognito user pool client
   user_pool_clients_config = var.user_pool_clients_config
+
 }

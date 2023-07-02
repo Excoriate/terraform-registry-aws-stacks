@@ -16,6 +16,7 @@ locals {
   is_user_pool_lambda_config_enabled                        = !local.is_enabled ? false : var.user_pool_lambda_config != null
   is_identity_provider_config_enabled                       = !local.is_enabled ? false : var.identity_provider_config != null
   is_user_pool_clients_config_enabled                       = !local.is_enabled ? false : var.user_pool_clients_config == null ? false : length(var.user_pool_clients_config) > 0
+  is_user_pool_domain_config_enabled                        = !local.is_enabled ? false : var.user_pool_domain_config != null
 
   // Naming convention
   stack  = !local.is_enabled ? null : lower(trimspace(var.stack))
