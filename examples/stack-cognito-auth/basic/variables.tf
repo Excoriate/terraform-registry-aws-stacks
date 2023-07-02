@@ -244,7 +244,7 @@ variable "user_pool_password_policy_temporary_password_validity_days" {
   default     = 7
 }
 
-variable "schema_attributes_config" {
+variable "user_pool_schema_attributes_config" {
   type = list(object({
     attribute_name           = string
     attribute_data_type      = string
@@ -269,7 +269,7 @@ EOF
   default     = null
 }
 
-variable "verification_message_template_config" {
+variable "user_pool_verification_message_template_config" {
   type = object({
     default_email_option  = optional(string, null)
     email_message_by_link = optional(string, null)
@@ -287,7 +287,7 @@ EOF
   default     = null
 }
 
-variable "lambda_config" {
+variable "user_pool_lambda_config" {
   type = object({
     create_auth_challenge          = optional(string, null)
     custom_message                 = optional(string, null)

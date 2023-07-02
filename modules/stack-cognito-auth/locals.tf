@@ -11,9 +11,9 @@ locals {
   is_user_pool_account_recovery_config_enabled              = !local.is_enabled ? false : var.user_pool_account_recovery_config != null
   is_user_pool_email_config_enabled                         = !local.is_enabled ? false : var.user_pool_ses_email_config != null
   is_user_pool_sms_configuration_enabled                    = !local.is_enabled ? false : var.user_pool_sms_configuration != null
-  is_user_pool_schema_attributes_config_enabled             = !local.is_enabled ? false : var.schema_attributes_config != null
-  is_user_pool_verification_message_template_config_enabled = !local.is_enabled ? false : var.verification_message_template_config != null
-  is_user_pool_lambda_config_enabled                        = !local.is_enabled ? false : var.lambda_config != null
+  is_user_pool_schema_attributes_config_enabled             = !local.is_enabled ? false : var.user_pool_schema_attributes_config != null
+  is_user_pool_verification_message_template_config_enabled = !local.is_enabled ? false : var.user_pool_verification_message_template_config != null
+  is_user_pool_lambda_config_enabled                        = !local.is_enabled ? false : var.user_pool_lambda_config != null
   is_identity_provider_config_enabled                       = !local.is_enabled ? false : var.identity_provider_config != null
 
   // Naming convention

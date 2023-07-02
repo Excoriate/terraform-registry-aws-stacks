@@ -136,14 +136,14 @@ module "auth_cognito_user_pool" {
   }
 
   schema_attributes_config = !local.is_user_pool_schema_attributes_config_enabled ? null : [
-    for s in var.schema_attributes_config : merge(s, { name = each.value })
+    for s in var.user_pool_schema_attributes_config : merge(s, { name = each.value })
   ]
 
   verification_message_template_config = !local.is_user_pool_verification_message_template_config_enabled ? null : [
-    for v in var.verification_message_template_config : merge(v, { name = each.value })
+    for v in var.user_pool_verification_message_template_config : merge(v, { name = each.value })
   ]
 
-  lambda_config = !local.is_user_pool_lambda_config_enabled ? null : merge(var.lambda_config, { name = each.value })
+  lambda_config = !local.is_user_pool_lambda_config_enabled ? null : merge(var.user_pool_lambda_config, { name = each.value })
 
   tags = local.tags
 

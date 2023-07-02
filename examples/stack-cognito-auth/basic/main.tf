@@ -26,9 +26,9 @@ module "main_module" {
   user_pool_password_policy_require_numbers                  = var.user_pool_password_policy_require_numbers
   user_pool_password_policy_require_symbols                  = var.user_pool_password_policy_require_symbols
   user_pool_password_policy_temporary_password_validity_days = var.user_pool_password_policy_temporary_password_validity_days
-  schema_attributes_config                                   = var.schema_attributes_config
-  verification_message_template_config                       = var.verification_message_template_config
-  lambda_config                                              = var.lambda_config
+  user_pool_schema_attributes_config                         = var.user_pool_schema_attributes_config
+  user_pool_verification_message_template_config             = var.user_pool_verification_message_template_config
+  user_pool_lambda_config                                    = var.user_pool_lambda_config
 
   // Identity provider.
   identity_provider_config = var.identity_provider_config
