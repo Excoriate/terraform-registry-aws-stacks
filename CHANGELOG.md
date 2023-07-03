@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.3.0...v1.3.1) (2023-07-03)
+
+
+### Docs
+
+* add listed new module in main readme.md ([2efcb09](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/2efcb0980cf604d46d0e15a3c771ba920e4762a6))
+
 ## [1.3.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.2.0...v1.3.0) (2023-07-03)
 
 
