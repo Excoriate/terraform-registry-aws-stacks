@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.2.0...v1.3.0) (2023-07-03)
+
+
+### Features
+
+* add identity provider as part of the module ([d3c576c](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/d3c576c5fdf757cedeea96af9227cf9ed88a2a25))
+* add ses configuration for auth stack ([b164860](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/b1648602f381ecab83965b16cabf5ca2ac1d4636))
+* add user pool client configuration ([e3d225b](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/e3d225bd499ef476a0886c093d7e1ccdc28682f2))
+* add user pool domain integration ([a160650](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/a1606504672d3d998df5f5b66e321ae7421a8689))
+
+
+### Refactoring
+
+* add prefix for user pool related input variables ([945433b](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/945433bddd8ec931fbc264e502df75f142a11535))
+
+
+### Docs
+
+* add generated terraform-docs ([cf44847](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/cf44847d9bed3856654b97ef45fabdf629d42b4c))
+
 ## [1.2.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.1.0...v1.2.0) (2023-05-21)
 
 
