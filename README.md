@@ -44,11 +44,12 @@ The documentation is **automatically generated** by [terraform-docs](https://ter
 
 ### Capabilities
 
-| Module                       | Status   | Description                                                                                                                                               |
-|------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `aws-dns-zone-multi-account` | Stable ✅ | A stack-composite module that implements a multi-account DNS zone delegation.                                                                             |
-| `aws-alb-http`               | Stable ✅ | Stack-composite module that implement a common ALB/Ingress architecture, for fronting a backend such as an ECS-based (micro?) service, API or equivalent. |
-| `aws-secrets-manager`        | Stable ✅ | Stack-composite that implement a common set of actions on top of an AWS secret, including replication, permissions, etc..                                 |
+| Module                             | Status   | Description                                                                                                                                                                  |
+|------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `stack-aws-dns-zone-multi-account` | Stable ✅ | A stack-composite module that implements a multi-account DNS zone delegation.                                                                                                |
+| `stack-aws-alb-http`               | Stable ✅ | Stack-composite module that implement a common ALB/Ingress architecture, for fronting a backend such as an ECS-based (micro?) service, API or equivalent.                    |
+| `stack-secrets-manager`            | Stable ✅ | Stack-composite that implement a common set of actions on top of an AWS secret, including replication, permissions, etc..                                                    |
+| `stack-auth (cognito)`             | Stable ✅ | Stack-composite that implement a full set of capabilities to perform authorization/authentication using Cognito, and SES (for email verification, password recoveryu, etc.). |
 
 ### Getting Started
 
