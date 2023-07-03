@@ -19,8 +19,7 @@ locals {
   is_user_pool_domain_config_enabled                        = !local.is_enabled ? false : var.user_pool_domain_config != null
 
   // Naming convention
-  stack  = !local.is_enabled ? null : lower(trimspace(var.stack))
-  prefix = !local.is_enabled ? null : !var.enable_stack_prefix ? null : local.stack
+  stack = !local.is_enabled ? null : lower(trimspace(var.stack))
 
   tags = local.is_enabled ? merge(
     {

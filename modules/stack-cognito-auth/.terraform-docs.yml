@@ -3,29 +3,48 @@ formatter: markdown table
 
 header-from: main.tf
 content: |-
-    # ☁️ AWS Secrets manager stack
+    # ☁️ AWS Auth Stack (SES/Cognito "battery included" 🔋 stack)
     ## Description
     {{ .Header }}
-    This stack module creates a secret in AWS Secrets Manager, and optionally, add IAM policies that can be attached if permissions are required.
-    * 🚀 Create a secret in AWS Secrets Manager
-    * 🚀 Create IAM policies.
-    * 🚀 Set custom permissions for the secret policies
+    This composite stack module provisions AWS Cognito and SES services, implementing all supported capabilities of the following open-source Terraform modules:
+
+    - [AWS SES Terraform module](https://github.com/Excoriate/terraform-registry-aws-events/tree/main/modules/ses):
+        * 🚀 Provision SES service.
+        * 🚀 Support for Email Sending/Receiving.
+        * 🚀 Configure Mail from domain.
+        * 🚀 Manage Email Verifications.
+       Refer to the [official AWS SES documentation](https://docs.aws.amazon.com/ses/latest/dg/Welcome.html) for more details on AWS SES.
+
+    - [AWS Cognito Terraform module](https://github.com/Excoriate/terraform-registry-aws-events/tree/main/modules/cognito):
+        * 🚀 Provision Cognito User Pool.
+        * 🚀 Support for Identity Providers and User Pool Clients.
+        * 🚀 Manage User Pool Domains and other resources.
+       Refer to the [official AWS Cognito documentation](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html) for more details on AWS Cognito.
 
     ---
     ## Example
     Examples of this module's usage are available in the [examples](./examples) folder.
 
     ```hcl
-    {{ include "../../examples/stack-secrets-manager/basic/main.tf" }}
+    {{ include "../../examples/stack-cognito-auth/basic/main.tf" }}
     ```
-    For an example that pass custom permissions to auto-generate an IAM policy, see:
-    ```hcl
-    {{ include "../../examples/stack-secrets-manager/basic/config/fixtures-with-permissions.tfvars" }}
 
     ```
-    For an example that creates a secret with regional replication, see:
+    A simple implementation can be found here:
     ```hcl
-    {{ include "../../examples/stack-secrets-manager/basic/config/fixtures-with-replication.tfvars" }}
+    {{ include "../../examples/stack-cognito-auth/basic/config/fixtures.tfvars" }}
+
+    ```
+
+    A more advanced one:
+    ```hcl
+    {{ include "../../examples/stack-cognito-auth/basic/config/fixtures-with-user-pool-client-many.tfvars" }}
+
+    ```
+
+    With all-included Email (SES) configuration
+    ```hcl
+    {{ include "../../examples/stack-cognito-auth/basic/config/fixtures-with-email-configuration.tfvars" }}
 
     ```
 

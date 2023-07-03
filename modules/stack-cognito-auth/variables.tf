@@ -31,17 +31,6 @@ but it will not be used as prefix for the resources created by this module.
 EOF
 }
 
-variable "enable_stack_prefix" {
-  type        = bool
-  description = <<EOF
-Whether to use the 'stack' variable as prefix for the resources created by
-this module. If set to false, the 'stack' variable will be used to manage
-internally 'terraform' logic but it will not be used as prefix for the
-resources created by this module.
-EOF
-  default     = true
-}
-
 /*
 -------------------------------------
 Cognito User Pool

@@ -263,7 +263,7 @@ tasks:
               tflint -v
 
               tflint --init
-              tflint .
+              tflint
         silent: true
 
     docs:

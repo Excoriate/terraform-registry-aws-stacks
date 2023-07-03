@@ -12,3 +12,28 @@ output "tags_set" {
   value       = var.tags
   description = "The tags set for the module."
 }
+
+output "cognito_user_pool" {
+  value       = module.auth_cognito_user_pool
+  description = "The Cognito User Pool."
+}
+
+output "cognito_user_pool_client" {
+  value       = module.auth_cognito_user_pool_clients
+  description = "The Cognito User Pool Client."
+}
+
+output "cognito_identity_provider" {
+  value       = module.auth_cognito_identity_provider
+  description = "The Cognito Identity Provider."
+}
+
+output "cognito_user_pool_domain" {
+  value       = module.auth_cognito_user_pool_domain
+  description = "The Cognito User Pool Domain."
+}
+
+output "email_configuration" {
+  value       = module.auth_ses
+  description = "The Cognito Email Configuration supported by SES."
+}
