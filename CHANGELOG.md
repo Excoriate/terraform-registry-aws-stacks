@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.3.1...v1.4.0) (2023-08-03)
+
+
+### Features
+
+* add alb-ecs-glue module ([081d960](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/081d960b7ba37e2fd1a1be78ff5d083cb97f17dc))
+* add alb-ecs-glue module ([4d8c14f](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/4d8c14f3d2e1cc2b74814a53d4b850ed33d48afb))
+
+
+### Bug Fixes
+
+* add preliminar version of alb glue module ([4110310](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/4110310fdc23562f5ea65bd8855fc4988060bd35))
+* add preliminar version of alb glue module ([d2cbde8](https://github.com/Excoriate/terraform-registry-aws-stacks/commit/d2cbde82635224afe47b235f24f94b13fad922ea))
+
 ## [1.3.1](https://github.com/Excoriate/terraform-registry-aws-stacks/compare/v1.3.0...v1.3.1) (2023-07-03)
 
 
