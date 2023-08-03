@@ -51,7 +51,7 @@ module "ecs_security_group" {
     }
   ]
 
-  security_group_rules_ooo = [
+  security_group_rules_ooo = local.is_sg_groups_interoperability_enabled ? [
     {
       sg_parent                              = format("%s-ecs-sg", local.stack_full)
       enable_all_outbound_traffic            = true
@@ -63,7 +63,17 @@ module "ecs_security_group" {
       custom_port                            = var.port_config.container_port
       enable_inbound_from_custom_port_source = true
     }
+  ]: [
+    // This delegates the responsibility of creating the security group rules that allow alb-ecs connection to another module.
+    {
+      sg_parent                              = format("%s-ecs-sg-ind", local.stack_full)
+      enable_all_outbound_traffic            = true
+      enable_outbound_https                  = true
+      enable_outbound_http                   = true
+      custom_port                            = var.port_config.container_port
+    }
   ]
+
 
   depends_on = [
     module.network_data
@@ -295,8 +305,8 @@ locals {
   ecs_sg_id = !local.is_alb_attachment_by_ecs_enabled ? null : data.aws_security_group.ecs_sg[local.stack].id
 }
 
-resource "aws_security_group_rule" "outbound_traffic_to_ecs_from_alb" {
-  for_each                 = !local.is_alb_attachment_by_ecs_enabled ? {} : local.stack_config_map
+resource "aws_security_group_rule" "attach_outbound_rule_to_alb_sg" {
+  for_each                 = !local.is_alb_attachment_by_ecs_enabled ? {} : !local.is_sg_groups_interoperability_enabled ? {} : local.stack_config_map
   type                     = "egress"
   from_port                = var.port_config.container_port
   to_port                  = var.port_config.container_port

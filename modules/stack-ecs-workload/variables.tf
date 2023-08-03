@@ -171,3 +171,14 @@ and recommended settings (E.g.: encryption, image scanning, etc).
 EOF
   default     = null
 }
+
+variable "enable_built_in_interoperability_alb_ecs_config" {
+  type = bool
+  description = <<EOF
+  Whether to enable the built-in interoperability between ALB and ECS or not. If set
+  it'll create and attach a security group rule that'll allow the inbound traffic from an
+  existing ALB. It'll also alter the state of the 'ALB' security group if exists, since it'll
+require to attach the 'ecs' security group to id as a reference.
+EOF
+  default = true
+}
