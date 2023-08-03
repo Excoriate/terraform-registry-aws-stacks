@@ -3,12 +3,20 @@ locals {
 
   aws_region_to_deploy = var.aws_region
 
-  create = !local.is_enabled ? {} : {
-    cfg = {
-      id = format("%s-glue-to-%s", var.alb_name, var.ecs_service_name)
-      alb = trimspace(var.alb_name)
-      ecs = trimspace(var.ecs_service_name)
-      cluster = trimspace(var.ecs_cluster_name)
+  stack_config = !local.is_enabled ? [] : [
+    {
+      name   = format("stack-%s-glue-to-%s", var.alb_name, var.ecs_security_group_name)
+      alb_name = var.alb_name
+      ecs_sg_name = var.ecs_security_group_name
+    }
+  ]
+
+  // Create a map with the key as the stack name
+  stack = !local.is_enabled ? {} : {
+    for stack in local.stack_config :
+    stack["name"] => {
+      alb_name = trimspace(stack["alb_name"])
+      ecs_sg_name = trimspace(stack["ecs_sg_name"])
     }
   }
 }
