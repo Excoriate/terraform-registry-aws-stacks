@@ -27,3 +27,8 @@ output "ecs_sg" {
   value       = data.aws_security_group.ecs_sg
   description = "The ECS security group resource."
 }
+
+output "rules"{
+  value       = local.sg_rules_to_create
+  description = "The rules object of the security groups."
+}

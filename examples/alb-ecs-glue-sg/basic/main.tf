@@ -5,4 +5,5 @@ module "main_module" {
 
   alb_name         = var.alb_name
   ecs_security_group_name = var.ecs_security_group_name
+  ports_to_bind = var.ports_to_bind
 }

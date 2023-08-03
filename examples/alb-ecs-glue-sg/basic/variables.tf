@@ -23,3 +23,12 @@ variable "ecs_security_group_name"{
 to retrieve the 'network' configuration. Therefore, we need to pass it as an input variable.
 EOF
 }
+
+variable "ports_to_bind"{
+  type = list(number)
+  description = <<EOF
+  The ports to bind to the ALB. It's a list of numbers, since we can bind multiple ports
+to the same ALB.
+EOF
+  default = [80, 443]
+}

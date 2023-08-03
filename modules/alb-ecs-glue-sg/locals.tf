@@ -19,4 +19,15 @@ locals {
       ecs_sg_name = trimspace(stack["ecs_sg_name"])
     }
   }
+
+  // Manage port binding.
+  port_binding = !local.is_enabled ? [] : [
+    for p in var.ports_to_bind :{
+      rule_name = format("port-%s", p)
+      stack = format("stack-%s-glue-to-%s", var.alb_name, var.ecs_security_group_name)
+      port = p
+    }
+  ]
+
+  sg_rules_to_create = !local.is_enabled ? {} : {for p in local.port_binding : p["rule_name"] => p }
 }
