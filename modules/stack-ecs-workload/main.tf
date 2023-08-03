@@ -66,7 +66,7 @@ module "ecs_security_group" {
   ]: [
     // This delegates the responsibility of creating the security group rules that allow alb-ecs connection to another module.
     {
-      sg_parent                              = format("%s-ecs-sg-ind", local.stack_full)
+      sg_parent                              = format("%s-ecs-sg", local.stack_full)
       enable_all_outbound_traffic            = true
       enable_outbound_https                  = true
       enable_outbound_http                   = true
